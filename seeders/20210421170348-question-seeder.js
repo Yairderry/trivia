@@ -72,10 +72,111 @@ module.exports = {
           desc: true,
         },
         {
-          template: "Which country has the least cell phones per person?",
+          template: "What is the capital of X?",
+          columns: "capital",
+          type: 2,
+          desc: null,
+        },
+        {
+          template: "How many people live in X?",
+          columns: "population",
+          type: 2,
+          desc: null,
+        },
+        {
+          template: "In what continent is X?",
+          columns: "continent",
+          type: 2,
+          desc: null,
+        },
+        {
+          template: "In what region is X?",
+          columns: "region",
+          type: 2,
+          desc: null,
+        },
+        {
+          template: "What is the GDP of X?",
+          columns: "gdp",
+          type: 2,
+          desc: null,
+        },
+        {
+          template:
+            "What is the percentage of people in the ages between 15 and 64 in X?",
+          columns: "age_15_to_64_years",
+          type: 2,
+          desc: null,
+        },
+        {
+          template: "Are there more people in X than in Y?",
+          columns: "population",
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Is X larger than Y?",
+          columns: "area",
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Does X have a higher population density than Y?",
+          columns: "density_pop",
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Is the crime rate of X higher than the crime rate in Y?",
+          columns: "crime_index",
+          type: 3,
+          desc: null,
+        },
+        {
+          template:
+            "Does X have a more people in the ages between 0 and 14 than Y?",
+          columns: "density_pop",
+          type: 3,
+          desc: null,
+        },
+        {
+          template:
+            "Is the literacy rate of X higher than the literacy rate in Y?",
+          columns: "literacy",
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Does X have a higher GDP than Y?",
+          columns: "gdp",
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Does X have a more phones per 1000 people than Y?",
           columns: "phones_per_1000",
-          type: 1,
-          desc: false,
+          type: 3,
+          desc: null,
+        },
+        {
+          template: "Is the safety rate of X higher than the safety rate in Y?",
+          columns: "safety_index",
+          type: 3,
+          desc: null,
+        },
+        {
+          template:
+            "Are restaurants in X more expensive than restaurants in Y?",
+          columns: "restaurant_price_index",
+          type: 3,
+          desc: null,
+        },
+        {
+          template:
+            "Is the quality of life in X higher than the quality of life in Y?",
+          columns: "quality_of_life_index",
+          type: 3,
+          desc: null,
         },
       ].map((country, i) => {
         country.id = i + 1;
