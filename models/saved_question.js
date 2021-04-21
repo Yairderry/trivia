@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Saved_question extends Model {
     /**
@@ -12,22 +10,25 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  Saved_question.init({
-    question: DataTypes.STRING,
-    option_1: DataTypes.STRING,
-    option_2: DataTypes.STRING,
-    option_3: DataTypes.STRING,
-    option_4: DataTypes.STRING,
-    answer: DataTypes.STRING,
-    rating: DataTypes.FLOAT,
-    vote_count: DataTypes.INTEGER,
-    answered_correct: DataTypes.INTEGER,
-    answered_wrong: DataTypes.INTEGER
-  }, {
-    sequelize,
-    modelName: 'Saved_question',
-    underscored: true,
-  });
+  }
+  Saved_question.init(
+    {
+      question: DataTypes.STRING,
+      option1: DataTypes.STRING,
+      option2: DataTypes.STRING,
+      option3: DataTypes.STRING,
+      option4: DataTypes.STRING,
+      answer: DataTypes.STRING,
+      rating: DataTypes.FLOAT,
+      voteCount: DataTypes.INTEGER,
+      answeredCorrect: DataTypes.INTEGER,
+      answeredWrong: DataTypes.INTEGER,
+    },
+    {
+      sequelize,
+      modelName: "SavedQuestion",
+      underscored: true,
+    }
+  );
   return Saved_question;
 };
