@@ -112,71 +112,71 @@ module.exports = {
           template: "Are there more people in X than in Y?",
           columns: "population",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Is X larger than Y?",
           columns: "area",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Does X have a higher population density than Y?",
           columns: "density_pop",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Is the crime rate of X higher than the crime rate in Y?",
           columns: "crime_index",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template:
             "Does X have a more people in the ages between 0 and 14 than Y?",
           columns: "density_pop",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template:
             "Is the literacy rate of X higher than the literacy rate in Y?",
           columns: "literacy",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Does X have a higher GDP than Y?",
           columns: "gdp",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Does X have a more phones per 1000 people than Y?",
           columns: "phones_per_1000",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template: "Is the safety rate of X higher than the safety rate in Y?",
           columns: "safety_index",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template:
             "Are restaurants in X more expensive than restaurants in Y?",
           columns: "restaurant_price_index",
           type: 3,
-          desc: null,
+          desc: true,
         },
         {
           template:
             "Is the quality of life in X higher than the quality of life in Y?",
           columns: "quality_of_life_index",
           type: 3,
-          desc: null,
+          desc: true,
         },
       ].map((country, i) => {
         country.id = i + 1;
