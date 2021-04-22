@@ -1,23 +1,28 @@
-const { SavedQuestion, Country, Question } = require("./models");
+const { User, SavedQuestion, Country, Question } = require("./models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
+/* generating new question start*/
 const generateQuestion = async () => {
-  const data = await randomQuestion();
-  const question = data.toJSON();
-  const { columns, type, template, desc } = question;
+  try {
+    const data = await randomQuestion();
+    const question = data.toJSON();
+    const { columns, type, template, desc } = question;
 
-  switch (type) {
-    case 1:
-      return await questionType1(columns, template, desc);
-    case 2:
-      return await questionType2(columns, template);
-    case 3:
-      return await questionType3(columns, template, desc);
+    switch (type) {
+      case 1:
+        return await questionType1(columns, template, desc);
+      case 2:
+        return await questionType2(columns, template);
+      case 3:
+        return await questionType3(columns, template, desc);
+    }
+  } catch (err) {
+    console.log("-------------generating question-------------");
+    console.log(err);
   }
 };
 
-// generators of the different types of questions
 const questionType1 = async (columns, question, desc) => {
   const countries = await get2RandomCountries(columns);
   const country = countries[0].toJSON();
@@ -62,15 +67,17 @@ const questionType3 = async (columns, template, desc) => {
   const country2 = countries[1].toJSON();
   let question = template.replace("Y", country2.country);
   question = question.replace("X", country1.country);
-  const answer = country1.columns > country2.columns;
   return {
     countriesId: [country1.id, country2.id],
     columns,
+    desc,
     question,
     options: [true, false],
   };
 };
+/* generating new question end*/
 
+/* checking users answer start*/
 const checkAnswer = async (answer, countries, columns, desc, type) => {
   switch (type) {
     case 1:
@@ -111,6 +118,50 @@ const checkAnswerType3 = async (answer, countries, columns, desc) => {
 
   return answer === expectedAnswer3[0] > expectedAnswer3[1];
 };
+/* checking users answer end*/
+
+/* get saved question start*/
+const getSavedQuestion = async (name) => {
+  const questionsAsked = await User.findOne({
+    where: { name },
+    include: {
+      model: SavedQuestion,
+    },
+  });
+
+  const questions = await SavedQuestion.findAll({
+    where: {
+      id: {
+        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
+      },
+    },
+    attributes: [
+      "id",
+      "question",
+      "option_1",
+      "option_2",
+      "option_3",
+      "option_4",
+      "rating",
+    ],
+  });
+
+  // create duplicates of each question data based on the rating
+  const questionsWithDuplicates = questions.flatMap((q) => {
+    const question = q.toJSON();
+    const arr = [];
+    for (var i = 0; i < Math.floor(question.rating); i++) arr.push(question);
+    return arr;
+  });
+
+  const pickedQuestion =
+    questionsWithDuplicates[
+      Math.floor(Math.random() * questionsWithDuplicates.length)
+    ];
+  delete pickedQuestion.rating;
+  return pickedQuestion;
+};
+/* get saved question end*/
 
 const saveQuestion = async ({
   question,
@@ -135,6 +186,33 @@ const saveQuestion = async ({
     answeredWrong: !isCorrect ? 1 : 0,
   });
 };
+
+const calculateSavedQuestionChance = async (name) => {
+  const questionsAsked = await User.findOne({
+    where: { name },
+    include: {
+      model: SavedQuestion,
+    },
+  });
+
+  const questions = await SavedQuestion.findAndCountAll({
+    where: {
+      id: {
+        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
+      },
+    },
+  });
+
+  const chance =
+    questions.count === 0
+      ? 0
+      : questions.count > 0 && questions.count <= 100
+      ? 0.1 + 0.06 * questions.count
+      : 0.7;
+
+  return chance;
+};
+
 // helper functions
 const randomQuestion = () => {
   return Question.findOne({

@@ -8,16 +8,16 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsToMany(models.User, { through: "Users_Questions" });
     }
   }
   Saved_question.init(
     {
       question: DataTypes.STRING,
-      option1: DataTypes.STRING,
-      option2: DataTypes.STRING,
-      option3: DataTypes.STRING,
-      option4: DataTypes.STRING,
+      option_1: DataTypes.STRING,
+      option_2: DataTypes.STRING,
+      option_3: DataTypes.STRING,
+      option_4: DataTypes.STRING,
       answer: DataTypes.STRING,
       rating: DataTypes.FLOAT,
       voteCount: DataTypes.INTEGER,
