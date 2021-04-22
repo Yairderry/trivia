@@ -206,6 +206,20 @@ const saveQuestion = async ({
   });
 };
 
+const rateQuestion = async (id, rating) => {
+  if (!/[1-5]/.test(rating)) throw new Error("No hacking!");
+  const savedQuestion = await SavedQuestion.update(
+    {
+      rating: Sequelize.literal(
+        `(rating * vote_count + ${rating} )/ (vote_count + 1)`
+      ),
+      voteCount: Sequelize.literal("vote_count + 1"),
+    },
+    { where: { id } }
+  );
+  return savedQuestion;
+};
+
 const calculateSavedQuestionChance = async (name) => {
   const questionsAsked = await User.findOne({
     where: { name },
@@ -276,4 +290,4 @@ const shuffleArray = (array) => {
   }
 };
 
-module.exports = { getQuestion, checkAnswer, saveQuestion };
+module.exports = { getQuestion, checkAnswer, saveQuestion, rateQuestion };
