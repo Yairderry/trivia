@@ -11,14 +11,14 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  users.init(
+  user.init(
     {
       score: DataTypes.INTEGER,
       name: DataTypes.STRING,
     },
     {
       sequelize,
-      modelName: "user",
+      modelName: "User",
       underscored: true,
     }
   );
