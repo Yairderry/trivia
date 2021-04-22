@@ -27,7 +27,7 @@ const questionType1 = async (columns, question, desc) => {
   const countries = await get2RandomCountries(columns);
   const country = countries[0].toJSON();
   const fakeAnswers = (
-    await get3RandomAnswers(columns, country.id, country.columns)
+    await get3RandomAnswers(columns, country.id, country[columns])
   ).map((answer) => answer.toJSON());
   const options = [
     ...fakeAnswers.map((answer) => answer.country),
@@ -47,7 +47,7 @@ const questionType2 = async (columns, template) => {
   const country = countries[0].toJSON();
   const question = template.replace("X", country.country);
   const fakeAnswers = (
-    await get3RandomAnswers(columns, country.id, country.columns)
+    await get3RandomAnswers(columns, country.id, country[columns])
   ).map((answer) => answer.toJSON());
   const options = [
     ...fakeAnswers.map((answer) => answer[columns]),
@@ -96,7 +96,6 @@ const checkAnswerType1 = async (answer, countries, columns, desc) => {
     limit: 1,
     attributes: ["country", columns],
   }).then((data) => data.toJSON());
-  console.log(expectedAnswer1);
   return answer === expectedAnswer1.country;
 };
 
@@ -158,10 +157,30 @@ const getSavedQuestion = async (name) => {
     questionsWithDuplicates[
       Math.floor(Math.random() * questionsWithDuplicates.length)
     ];
-  delete pickedQuestion.rating;
+  const { option_1, option_2, option_3, option_4 } = pickedQuestion;
+  pickedQuestion.options = [option_1, option_2, option_3, option_4];
+  delete pickedQuestion.rating,
+    delete pickedQuestion.option_1,
+    delete pickedQuestion.option_2,
+    delete pickedQuestion.option_3,
+    delete pickedQuestion.option_4;
   return pickedQuestion;
 };
 /* get saved question end*/
+
+const getQuestion = async (name) => {
+  const chance = await calculateSavedQuestionChance(name);
+  const rand = Math.floor(Math.random() * 100 + 1);
+  console.log(rand);
+  console.log(chance);
+  const question =
+    chance === 0
+      ? await generateQuestion()
+      : chance >= rand
+      ? await getSavedQuestion(name)
+      : await generateQuestion();
+  return question;
+};
 
 const saveQuestion = async ({
   question,
@@ -207,8 +226,8 @@ const calculateSavedQuestionChance = async (name) => {
     questions.count === 0
       ? 0
       : questions.count > 0 && questions.count <= 100
-      ? 0.1 + 0.06 * questions.count
-      : 0.7;
+      ? 10 + 6 * questions.count
+      : 70;
 
   return chance;
 };
@@ -257,4 +276,4 @@ const shuffleArray = (array) => {
   }
 };
 
-module.exports = { generateQuestion, checkAnswer, saveQuestion };
+module.exports = { getQuestion, checkAnswer, saveQuestion };
