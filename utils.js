@@ -124,16 +124,21 @@ const checkAnswerType1 = async (answer, countries, columns, desc) => {
     limit: 1,
     attributes: ["country", columns],
   }).then((data) => data.toJSON());
-  return answer === expectedAnswer.country;
+  return {
+    correctAnswer: correctAnswer.answer,
+    UserAnswer: answer,
+  };
 };
 
 const checkAnswerType2 = async (answer, countries, columns) => {
   const expectedAnswer = await Country.findOne({
     where: { id: countries[0] },
     attributes: [columns],
-  });
-  const correctAnswer = expectedAnswer.toJSON();
-  return answer === correctAnswer[columns];
+  }).then((data) => data.toJSON());
+  return {
+    correctAnswer: expectedAnswer[columns],
+    UserAnswer: answer,
+  };
 };
 
 const checkAnswerType3 = async (answer, countries, columns, desc) => {
@@ -143,7 +148,10 @@ const checkAnswerType3 = async (answer, countries, columns, desc) => {
     attributes: [columns],
   }).then((data) => data.map((ans) => ans.toJSON()[columns]));
 
-  return answer === expectedAnswer[0] > expectedAnswer[1];
+  return {
+    correctAnswer: expectedAnswer[0] > expectedAnswer[1],
+    UserAnswer: answer,
+  };
 };
 
 // when answering a saved question
@@ -151,9 +159,17 @@ const checkAnswerType4 = async (answer, questionId) => {
   const expectedAnswer = await SavedQuestion.findOne({
     where: { id: questionId },
     attributes: ["answer"],
-  });
-  const correctAnswer = expectedAnswer.toJSON();
-  return answer === correctAnswer.answer;
+  }).then((data) => data.toJSON());
+  const correctAnswer =
+    expectedAnswer === "false"
+      ? false
+      : expectedAnswer === "true"
+      ? true
+      : expectedAnswer;
+  return {
+    correctAnswer: correctAnswer.answer,
+    UserAnswer: answer,
+  };
 };
 /* checking users answer end*/
 
