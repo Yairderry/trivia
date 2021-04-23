@@ -220,6 +220,39 @@ const rateQuestion = async (id, rating) => {
   return savedQuestion;
 };
 
+const createUser = async (name) => {
+  const user = await User.create({ name, score: 0, strikes: 0 });
+  return user.toJSON();
+};
+
+const updateScore = async (id, score) => {
+  if (!Number.isInteger(score)) throw new Error("No hacking!");
+
+  score === 0
+    ? await User.increment("strikes", {
+        by: 1,
+        where: { id },
+      })
+    : await User.increment("score", {
+        by: score,
+        where: { id },
+      });
+
+  const updatedUser = await User.findOne({
+    where: { id },
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+  return updatedUser.toJSON();
+};
+
+const getScoreboard = async () => {
+  const users = await User.findAll({
+    order: [["score", "DESC"]],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+  return users.map((user) => user.toJSON());
+};
+
 const calculateSavedQuestionChance = async (name) => {
   const questionsAsked = await User.findOne({
     where: { name },
@@ -290,4 +323,11 @@ const shuffleArray = (array) => {
   }
 };
 
-module.exports = { getQuestion, checkAnswer, saveQuestion, rateQuestion };
+module.exports = {
+  getQuestion,
+  checkAnswer,
+  saveQuestion,
+  rateQuestion,
+  createUser,
+  updateScore,
+};

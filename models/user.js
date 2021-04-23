@@ -15,6 +15,13 @@ module.exports = (sequelize, DataTypes) => {
     {
       score: DataTypes.INTEGER,
       name: DataTypes.STRING,
+      strikes: DataTypes.INTEGER,
+      playing: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return this.getDataValue("strikes") < 3;
+        },
+      },
     },
     {
       sequelize,
