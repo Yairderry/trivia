@@ -2,6 +2,178 @@ const { User, SavedQuestion, Country, Question } = require("./models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
+export default getQuestion = async (name) => {
+  const chance = await calculateSavedQuestionChance(name);
+  const question =
+    chance === 0
+      ? await generateQuestion()
+      : chance >= Math.floor(Math.random() * 100 + 1)
+      ? await getSavedQuestion(name)
+      : await generateQuestion();
+  return question;
+};
+
+export default saveQuestion = async ({
+  question,
+  option1,
+  option2,
+  option3,
+  option4,
+  answer,
+  rating,
+  isCorrect,
+}) => {
+  await SavedQuestion.create({
+    question,
+    option1,
+    option2,
+    option3,
+    option4,
+    answer,
+    rating,
+    voteCount: 1,
+    answeredCorrect: isCorrect ? 1 : 0,
+    answeredWrong: !isCorrect ? 1 : 0,
+  });
+};
+
+export default rateQuestion = async (id, rating) => {
+  if (!/[1-5]/.test(rating)) throw new Error("No hacking!");
+  const savedQuestion = await SavedQuestion.update(
+    {
+      rating: Sequelize.literal(
+        `(rating * vote_count + ${rating} )/ (vote_count + 1)`
+      ),
+      voteCount: Sequelize.literal("vote_count + 1"),
+    },
+    { where: { id } }
+  );
+  return savedQuestion;
+};
+
+export default createUser = async (name) => {
+  const user = await User.create({ name, score: 0, strikes: 0 });
+  return user.toJSON();
+};
+
+export default updateScore = async (id, score) => {
+  if (!Number.isInteger(score)) throw new Error("No hacking!");
+
+  score === 0
+    ? await User.increment("strikes", {
+        by: 1,
+        where: { id },
+      })
+    : await User.increment("score", {
+        by: score,
+        where: { id },
+      });
+
+  const updatedUser = await User.findOne({
+    where: { id },
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+  return updatedUser.toJSON();
+};
+
+export default getScoreboard = async () => {
+  const users = await User.findAll({
+    order: [["score", "DESC"]],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+  return users.map((user) => user.toJSON());
+};
+
+export default checkAnswer = async (answer, countries, columns, desc, type) => {
+  switch (type) {
+    case 1:
+      return await checkAnswerType1(answer, countries, columns, desc);
+    case 2:
+      return await checkAnswerType2(answer, countries, columns);
+    case 3:
+      return await checkAnswerType3(answer, countries, columns, desc);
+  }
+};
+
+/* checking users answer start*/
+const checkAnswerType1 = async (answer, countries, columns, desc) => {
+  const expectedAnswer1 = await Country.findOne({
+    where: { [Op.or]: countries.map((id) => ({ id })) },
+    order: [[columns, desc ? "ASC" : "DESC"]],
+    limit: 1,
+    attributes: ["country", columns],
+  }).then((data) => data.toJSON());
+  return answer === expectedAnswer1.country;
+};
+
+const checkAnswerType2 = async (answer, countries, columns) => {
+  const expectedAnswer2 = await Country.findOne({
+    where: { id: countries[0] },
+    attributes: [columns],
+  });
+  const correctAnswer2 = expectedAnswer2.toJSON();
+  return answer === correctAnswer2[columns];
+};
+
+const checkAnswerType3 = async (answer, countries, columns, desc) => {
+  const expectedAnswer3 = await Country.findAll({
+    where: { [Op.or]: [countries.map((id) => ({ id }))] },
+    order: [[columns, desc ? "DESC" : "ASC"]],
+    attributes: [columns],
+  }).then((data) => data.map((ans) => ans.toJSON()[columns]));
+
+  return answer === expectedAnswer3[0] > expectedAnswer3[1];
+};
+/* checking users answer end*/
+
+/* get question start*/
+const getSavedQuestion = async (name) => {
+  const questionsAsked = await User.findOne({
+    where: { name },
+    include: {
+      model: SavedQuestion,
+    },
+  });
+
+  const questions = await SavedQuestion.findAll({
+    where: {
+      id: {
+        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
+      },
+    },
+    attributes: [
+      "id",
+      "question",
+      "option_1",
+      "option_2",
+      "option_3",
+      "option_4",
+      "rating",
+    ],
+  });
+
+  // create duplicates of each question data based on the rating
+  const questionsWithDuplicates = questions.flatMap((q) => {
+    const question = q.toJSON();
+    const arr = [];
+    for (var i = 0; i < Math.floor(question.rating); i++) arr.push(question);
+    return arr;
+  });
+
+  const pickedQuestion =
+    questionsWithDuplicates[
+      Math.floor(Math.random() * questionsWithDuplicates.length)
+    ];
+  const { option_1, option_2, option_3, option_4 } = pickedQuestion;
+  pickedQuestion.options = [option_1, option_2, option_3, option_4];
+  delete pickedQuestion.rating,
+    delete pickedQuestion.option_1,
+    delete pickedQuestion.option_2,
+    delete pickedQuestion.option_3,
+    delete pickedQuestion.option_4;
+  return pickedQuestion;
+};
+
 /* generating new question start*/
 const generateQuestion = async () => {
   try {
@@ -75,183 +247,6 @@ const questionType3 = async (columns, template, desc) => {
     options: [true, false],
   };
 };
-/* generating new question end*/
-
-/* checking users answer start*/
-const checkAnswer = async (answer, countries, columns, desc, type) => {
-  switch (type) {
-    case 1:
-      return await checkAnswerType1(answer, countries, columns, desc);
-    case 2:
-      return await checkAnswerType2(answer, countries, columns);
-    case 3:
-      return await checkAnswerType3(answer, countries, columns, desc);
-  }
-};
-
-const checkAnswerType1 = async (answer, countries, columns, desc) => {
-  const expectedAnswer1 = await Country.findOne({
-    where: { [Op.or]: countries.map((id) => ({ id })) },
-    order: [[columns, desc ? "ASC" : "DESC"]],
-    limit: 1,
-    attributes: ["country", columns],
-  }).then((data) => data.toJSON());
-  return answer === expectedAnswer1.country;
-};
-
-const checkAnswerType2 = async (answer, countries, columns) => {
-  const expectedAnswer2 = await Country.findOne({
-    where: { id: countries[0] },
-    attributes: [columns],
-  });
-  const correctAnswer2 = expectedAnswer2.toJSON();
-  return answer === correctAnswer2[columns];
-};
-
-const checkAnswerType3 = async (answer, countries, columns, desc) => {
-  const expectedAnswer3 = await Country.findAll({
-    where: { [Op.or]: [countries.map((id) => ({ id }))] },
-    order: [[columns, desc ? "DESC" : "ASC"]],
-    attributes: [columns],
-  }).then((data) => data.map((ans) => ans.toJSON()[columns]));
-
-  return answer === expectedAnswer3[0] > expectedAnswer3[1];
-};
-/* checking users answer end*/
-
-/* get saved question start*/
-const getSavedQuestion = async (name) => {
-  const questionsAsked = await User.findOne({
-    where: { name },
-    include: {
-      model: SavedQuestion,
-    },
-  });
-
-  const questions = await SavedQuestion.findAll({
-    where: {
-      id: {
-        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
-      },
-    },
-    attributes: [
-      "id",
-      "question",
-      "option_1",
-      "option_2",
-      "option_3",
-      "option_4",
-      "rating",
-    ],
-  });
-
-  // create duplicates of each question data based on the rating
-  const questionsWithDuplicates = questions.flatMap((q) => {
-    const question = q.toJSON();
-    const arr = [];
-    for (var i = 0; i < Math.floor(question.rating); i++) arr.push(question);
-    return arr;
-  });
-
-  const pickedQuestion =
-    questionsWithDuplicates[
-      Math.floor(Math.random() * questionsWithDuplicates.length)
-    ];
-  const { option_1, option_2, option_3, option_4 } = pickedQuestion;
-  pickedQuestion.options = [option_1, option_2, option_3, option_4];
-  delete pickedQuestion.rating,
-    delete pickedQuestion.option_1,
-    delete pickedQuestion.option_2,
-    delete pickedQuestion.option_3,
-    delete pickedQuestion.option_4;
-  return pickedQuestion;
-};
-/* get saved question end*/
-
-const getQuestion = async (name) => {
-  const chance = await calculateSavedQuestionChance(name);
-  const rand = Math.floor(Math.random() * 100 + 1);
-  console.log(rand);
-  console.log(chance);
-  const question =
-    chance === 0
-      ? await generateQuestion()
-      : chance >= rand
-      ? await getSavedQuestion(name)
-      : await generateQuestion();
-  return question;
-};
-
-const saveQuestion = async ({
-  question,
-  option1,
-  option2,
-  option3,
-  option4,
-  answer,
-  rating,
-  isCorrect,
-}) => {
-  await SavedQuestion.create({
-    question,
-    option1,
-    option2,
-    option3,
-    option4,
-    answer,
-    rating,
-    voteCount: 1,
-    answeredCorrect: isCorrect ? 1 : 0,
-    answeredWrong: !isCorrect ? 1 : 0,
-  });
-};
-
-const rateQuestion = async (id, rating) => {
-  if (!/[1-5]/.test(rating)) throw new Error("No hacking!");
-  const savedQuestion = await SavedQuestion.update(
-    {
-      rating: Sequelize.literal(
-        `(rating * vote_count + ${rating} )/ (vote_count + 1)`
-      ),
-      voteCount: Sequelize.literal("vote_count + 1"),
-    },
-    { where: { id } }
-  );
-  return savedQuestion;
-};
-
-const createUser = async (name) => {
-  const user = await User.create({ name, score: 0, strikes: 0 });
-  return user.toJSON();
-};
-
-const updateScore = async (id, score) => {
-  if (!Number.isInteger(score)) throw new Error("No hacking!");
-
-  score === 0
-    ? await User.increment("strikes", {
-        by: 1,
-        where: { id },
-      })
-    : await User.increment("score", {
-        by: score,
-        where: { id },
-      });
-
-  const updatedUser = await User.findOne({
-    where: { id },
-    attributes: { exclude: ["createdAt", "updatedAt"] },
-  });
-  return updatedUser.toJSON();
-};
-
-const getScoreboard = async () => {
-  const users = await User.findAll({
-    order: [["score", "DESC"]],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
-  });
-  return users.map((user) => user.toJSON());
-};
 
 const calculateSavedQuestionChance = async (name) => {
   const questionsAsked = await User.findOne({
@@ -278,6 +273,8 @@ const calculateSavedQuestionChance = async (name) => {
 
   return chance;
 };
+/* generating new question end*/
+/* get question end*/
 
 // helper functions
 const randomQuestion = () => {
@@ -321,13 +318,4 @@ const shuffleArray = (array) => {
     array[i] = array[j];
     array[j] = temp;
   }
-};
-
-module.exports = {
-  getQuestion,
-  checkAnswer,
-  saveQuestion,
-  rateQuestion,
-  createUser,
-  updateScore,
 };
