@@ -1,8 +1,14 @@
-const { User, SavedQuestion, Country, Question } = require("./models");
+const {
+  UsersQuestions,
+  User,
+  SavedQuestion,
+  Country,
+  Question,
+} = require("./models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
-export default getQuestion = async (name) => {
+const getQuestion = async (name) => {
   const chance = await calculateSavedQuestionChance(name);
   const question =
     chance === 0
@@ -13,7 +19,7 @@ export default getQuestion = async (name) => {
   return question;
 };
 
-export default saveQuestion = async ({
+const saveQuestion = async ({
   question,
   option1,
   option2,
@@ -37,7 +43,7 @@ export default saveQuestion = async ({
   });
 };
 
-export default rateQuestion = async (id, rating) => {
+const rateQuestion = async (id, rating) => {
   if (!/[1-5]/.test(rating)) throw new Error("No hacking!");
   const savedQuestion = await SavedQuestion.update(
     {
@@ -51,12 +57,12 @@ export default rateQuestion = async (id, rating) => {
   return savedQuestion;
 };
 
-export default createUser = async (name) => {
+const createUser = async (name) => {
   const user = await User.create({ name, score: 0, strikes: 0 });
   return user.toJSON();
 };
 
-export default updateScore = async (id, score) => {
+const updateScore = async (id, score) => {
   if (!Number.isInteger(score)) throw new Error("No hacking!");
 
   score === 0
@@ -76,7 +82,7 @@ export default updateScore = async (id, score) => {
   return updatedUser.toJSON();
 };
 
-export default getScoreboard = async () => {
+const getScoreboard = async () => {
   const users = await User.findAll({
     order: [["score", "DESC"]],
     attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -84,7 +90,17 @@ export default getScoreboard = async () => {
   return users.map((user) => user.toJSON());
 };
 
-export default checkAnswer = async (answer, countries, columns, desc, type) => {
+const checkAnswer = async (
+  userId,
+  answer,
+  questionId,
+  countries,
+  columns,
+  desc,
+  type
+) => {
+  if (questionId) return await checkAnswerType4(answer, questionId);
+
   switch (type) {
     case 1:
       return await checkAnswerType1(answer, countries, columns, desc);
@@ -97,32 +113,42 @@ export default checkAnswer = async (answer, countries, columns, desc, type) => {
 
 /* checking users answer start*/
 const checkAnswerType1 = async (answer, countries, columns, desc) => {
-  const expectedAnswer1 = await Country.findOne({
+  const expectedAnswer = await Country.findOne({
     where: { [Op.or]: countries.map((id) => ({ id })) },
     order: [[columns, desc ? "ASC" : "DESC"]],
     limit: 1,
     attributes: ["country", columns],
   }).then((data) => data.toJSON());
-  return answer === expectedAnswer1.country;
+  return answer === expectedAnswer.country;
 };
 
 const checkAnswerType2 = async (answer, countries, columns) => {
-  const expectedAnswer2 = await Country.findOne({
+  const expectedAnswer = await Country.findOne({
     where: { id: countries[0] },
     attributes: [columns],
   });
-  const correctAnswer2 = expectedAnswer2.toJSON();
-  return answer === correctAnswer2[columns];
+  const correctAnswer = expectedAnswer.toJSON();
+  return answer === correctAnswer[columns];
 };
 
 const checkAnswerType3 = async (answer, countries, columns, desc) => {
-  const expectedAnswer3 = await Country.findAll({
+  const expectedAnswer = await Country.findAll({
     where: { [Op.or]: [countries.map((id) => ({ id }))] },
     order: [[columns, desc ? "DESC" : "ASC"]],
     attributes: [columns],
   }).then((data) => data.map((ans) => ans.toJSON()[columns]));
 
-  return answer === expectedAnswer3[0] > expectedAnswer3[1];
+  return answer === expectedAnswer[0] > expectedAnswer[1];
+};
+
+// when answering a saved question
+const checkAnswerType4 = async (answer, questionId) => {
+  const expectedAnswer = await SavedQuestion.findOne({
+    where: { id: questionId },
+    attributes: ["answer"],
+  });
+  const correctAnswer = expectedAnswer.toJSON();
+  return answer === correctAnswer.answer;
 };
 /* checking users answer end*/
 
@@ -318,4 +344,16 @@ const shuffleArray = (array) => {
     array[i] = array[j];
     array[j] = temp;
   }
+};
+
+// checkAnswerType4("e", 3).then((data) => console.log(data));
+
+module.exports = {
+  getQuestion,
+  getScoreboard,
+  saveQuestion,
+  rateQuestion,
+  createUser,
+  updateScore,
+  checkAnswer,
 };

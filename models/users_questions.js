@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
   Users_Questions.init(
     {
       userId: DataTypes.INTEGER,
-      questionId: DataTypes.INTEGER,
+      SavedQuestionId: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "Users_Questions",
+      modelName: "UsersQuestions",
       underscored: true,
     }
   );
