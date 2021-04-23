@@ -19,32 +19,32 @@ const getQuestion = async (name) => {
   return question;
 };
 
-const saveQuestion = async ({
-  question,
-  option1,
-  option2,
-  option3,
-  option4,
-  answer,
-  rating,
-  isCorrect,
-}) => {
-  await SavedQuestion.create({
+const saveQuestion = async (
+  userId,
+  { question, option_1, option_2, option_3, option_4, answer, isCorrect },
+  rating
+) => {
+  const savedQuestion = await SavedQuestion.create({
     question,
-    option1,
-    option2,
-    option3,
-    option4,
+    option_1,
+    option_2,
+    option_3,
+    option_4,
     answer,
-    rating,
-    voteCount: 1,
+    rating: 0,
+    voteCount: 0,
     answeredCorrect: isCorrect ? 1 : 0,
     answeredWrong: !isCorrect ? 1 : 0,
   });
+  const { id } = savedQuestion.toJSON();
+  const rated = await rateQuestion(id, rating);
+  const added = await UsersQuestions.create({ userId, savedQuestionId: id });
+  return added;
 };
 
 const rateQuestion = async (id, rating) => {
   if (!/[1-5]/.test(rating)) throw new Error("No hacking!");
+
   const savedQuestion = await SavedQuestion.update(
     {
       rating: Sequelize.literal(
@@ -59,12 +59,13 @@ const rateQuestion = async (id, rating) => {
 
 const createUser = async (name) => {
   const user = await User.create({ name, score: 0, strikes: 0 });
-  return user.toJSON();
+  const userData = user.toJSON();
+  delete userData.createdAt;
+  delete userData.updatedAt;
+  return userData;
 };
 
 const updateScore = async (id, score) => {
-  if (!Number.isInteger(score)) throw new Error("No hacking!");
-
   score === 0
     ? await User.increment("strikes", {
         by: 1,
@@ -91,7 +92,6 @@ const getScoreboard = async () => {
 };
 
 const checkAnswer = async (
-  userId,
   answer,
   questionId,
   countries,
@@ -109,6 +109,11 @@ const checkAnswer = async (
     case 3:
       return await checkAnswerType3(answer, countries, columns, desc);
   }
+};
+
+const endGameFor = async (userId) => {
+  const endGame = await UsersQuestions.destroy({ where: { userId } });
+  return endGame;
 };
 
 /* checking users answer start*/
@@ -346,8 +351,6 @@ const shuffleArray = (array) => {
   }
 };
 
-// checkAnswerType4("e", 3).then((data) => console.log(data));
-
 module.exports = {
   getQuestion,
   getScoreboard,
@@ -356,4 +359,5 @@ module.exports = {
   createUser,
   updateScore,
   checkAnswer,
+  endGameFor,
 };

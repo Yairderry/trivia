@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Users_Questions.init(
     {
       userId: DataTypes.INTEGER,
-      SavedQuestionId: DataTypes.INTEGER,
+      savedQuestionId: DataTypes.INTEGER,
     },
     {
       sequelize,
