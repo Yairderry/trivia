@@ -26,7 +26,7 @@ question.post("/check-answer", async (req, res) => {
     const { answer, questionId } = req.query;
     const { countriesId, columns, desc, type } = req.body;
     const isCorrect = await checkAnswer(
-      answer,
+      Number(answer) ? Number(answer) : answer,
       Number(questionId),
       countriesId,
       columns,

@@ -15,7 +15,7 @@
 
 .question-section {
   border-radius: 10px;
-  background-color: red;
+  background-color: rgb(0, 102, 255);
   width: 30vw;
   padding: 5px;
   margin: auto;
@@ -23,4 +23,14 @@
 }
 
 .option-question {
+  background-color: rgb(105, 150, 218);
+  margin: auto;
+  margin-top: 3px;
+  width: 150px;
+  padding: 7px;
+  border-radius: 5px;
+}
+
+.option-question:hover {
+  background-color: rgb(64, 123, 211);
 }

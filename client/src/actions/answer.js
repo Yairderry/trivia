@@ -25,45 +25,52 @@ export const setAnswerError = (payload) => ({
 });
 
 const errorFade = (dispatch, message) => {
-  dispatch({ type: SET_ANSWER_ERROR, payload: message });
-  setTimeout(() => dispatch({ type: SET_ANSWER_ERROR, payload: "" }), 3000);
+  dispatch({ type: "SET_USER_ERROR", payload: message });
+  setTimeout(() => dispatch({ type: "SET_USER_ERROR", payload: "" }), 3000);
 };
 
 export const checkAnswer = () => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     dispatch({ type: SET_ANSWER_LOADER });
 
-    const { question, answer } = getState();
+    const { user, question, answer } = getState();
 
     if (!answer.userAnswer) return;
 
-    question.id
-      ? axios
-          .post(
-            `api/question/check-answer?questionId=${question.id}&answer=${answer.userAnswer}`,
-            { ...question }
-          )
-          .then((data) => {
-            dispatch({
-              type: SET_ANSWER,
-              payload: { ...data.data, loading: false, error: "" },
+    try {
+      const { data } = question.id
+        ? await axios
+            .post(
+              `api/question/check-answer?questionId=${question.id}&answer=${answer.userAnswer}`,
+              { ...question }
+            )
+            .catch((err) => {
+              errorFade(dispatch, err.response.data);
+            })
+        : await axios
+            .post(`api/question/check-answer?answer=${answer.userAnswer}`, {
+              ...question,
+            })
+            .catch((err) => {
+              errorFade(dispatch, err.response.data);
             });
-          })
-          .catch((err) => {
-            errorFade(dispatch, err.response.data);
-          })
-      : axios
-          .post(`api/question/check-answer?answer=${answer.userAnswer}`, {
-            ...question,
-          })
-          .then((data) => {
-            dispatch({
-              type: SET_ANSWER,
-              payload: { ...data.data, loading: false, error: "" },
-            });
-          })
-          .catch((err) => {
-            errorFade(dispatch, err.response.data);
-          });
+
+      dispatch({
+        type: SET_ANSWER,
+        payload: { ...data, loading: false, error: "" },
+      });
+
+      const score = data.userAnswer === data.correctAnswer ? 100 : 0;
+
+      dispatch({ type: "SET_USER_LOADER" });
+      axios
+        .put(`api/user/update-score?id=${user.id}&score=${score}`)
+        .then((data) => dispatch({ type: "SET_USER", payload: data.data }))
+        .catch((err) => {
+          errorFade(dispatch, err.response.data);
+        });
+    } catch (err) {
+      errorFade(dispatch, err.response.data);
+    }
   };
 };
