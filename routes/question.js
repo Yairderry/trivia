@@ -10,9 +10,10 @@ const question = Router();
 
 question.get("/new", async (req, res) => {
   try {
-    const { name } = req.query;
-    if (!name) throw Error("You need to enter user name!");
-    const question = await getQuestion(name);
+    const { userId } = req.query;
+    if (!userId) throw Error("You need to enter user id!");
+
+    const question = await getQuestion(userId);
     res.json({ ...question, loading: false, error: "" });
   } catch (error) {
     if (error.message === "You need to enter user name!")
@@ -23,9 +24,10 @@ question.get("/new", async (req, res) => {
 
 question.post("/check-answer", async (req, res) => {
   try {
-    const { answer, questionId } = req.query;
+    const { answer, questionId, userId } = req.query;
     const { countriesId, columns, desc, type } = req.body;
     const isCorrect = await checkAnswer(
+      Number(userId),
       Number(answer) ? Number(answer) : answer,
       Number(questionId),
       countriesId,
@@ -35,6 +37,7 @@ question.post("/check-answer", async (req, res) => {
     );
     res.json({ ...isCorrect, loading: false, error: "" });
   } catch (error) {
+    console.log(err);
     res.status(500).send(error.message);
   }
 });

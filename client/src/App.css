@@ -34,3 +34,7 @@
 .option-question:hover {
   background-color: rgb(64, 123, 211);
 }
+
+.checked {
+  font-weight: 900;
+}

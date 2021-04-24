@@ -10,11 +10,10 @@ export default function Game() {
   const { name, score, strikes, error, loading } = useSelector(
     (state) => state.user
   );
-  const answer = useSelector((state) => state.answer);
 
   useEffect(() => {
     dispatch(getQuestion());
-  }, [answer.correctAnswer]);
+  }, [score, strikes]);
 
   return (
     <div>

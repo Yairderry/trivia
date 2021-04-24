@@ -8,13 +8,13 @@ const {
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
 
-const getQuestion = async (name) => {
-  const chance = await calculateSavedQuestionChance(name);
+const getQuestion = async (id) => {
+  const chance = await calculateSavedQuestionChance(id);
   const question =
     chance === 0
       ? await generateQuestion()
       : chance >= Math.floor(Math.random() * 100 + 1)
-      ? await getSavedQuestion(name)
+      ? await getSavedQuestion(id)
       : await generateQuestion();
   return question;
 };
@@ -92,6 +92,7 @@ const getScoreboard = async () => {
 };
 
 const checkAnswer = async (
+  userId,
   answer,
   questionId,
   countries,
@@ -99,7 +100,7 @@ const checkAnswer = async (
   desc,
   type
 ) => {
-  if (questionId) return await checkAnswerType4(answer, questionId);
+  if (questionId) return await checkAnswerType4(answer, questionId, userId);
 
   switch (type) {
     case 1:
@@ -157,7 +158,7 @@ const checkAnswerType3 = async (answer, countries, columns, desc) => {
 };
 
 // when answering a saved question
-const checkAnswerType4 = async (answer, questionId) => {
+const checkAnswerType4 = async (answer, questionId, userId) => {
   const expectedAnswer = await SavedQuestion.findOne({
     where: { id: questionId },
     attributes: ["answer"],
@@ -168,6 +169,8 @@ const checkAnswerType4 = async (answer, questionId) => {
       : expectedAnswer === "true"
       ? true
       : expectedAnswer;
+
+  await UsersQuestions.create({ userId, savedQuestionId: questionId });
   return {
     correctAnswer: correctAnswer.answer,
     userAnswer: answer,
@@ -176,9 +179,9 @@ const checkAnswerType4 = async (answer, questionId) => {
 /* checking users answer end*/
 
 /* get question start*/
-const getSavedQuestion = async (name) => {
+const getSavedQuestion = async (id) => {
   const questionsAsked = await User.findOne({
-    where: { name },
+    where: { id },
     include: {
       model: SavedQuestion,
     },
@@ -208,13 +211,12 @@ const getSavedQuestion = async (name) => {
     for (var i = 0; i < Math.floor(question.rating); i++) arr.push(question);
     return arr;
   });
+  const rand = Math.floor(Math.random() * questionsWithDuplicates.length);
+  const pickedQuestion = questionsWithDuplicates[rand];
 
-  const pickedQuestion =
-    questionsWithDuplicates[
-      Math.floor(Math.random() * questionsWithDuplicates.length)
-    ];
   const { option_1, option_2, option_3, option_4 } = pickedQuestion;
-  pickedQuestion.options = [option_1, option_2, option_3, option_4];
+  pickedQuestion.options = [option_1, option_2];
+  option_3 && option_4 && pickedQuestion.options.push(option_3, option_4);
   delete pickedQuestion.rating,
     delete pickedQuestion.option_1,
     delete pickedQuestion.option_2,
@@ -300,9 +302,9 @@ const questionType3 = async (columns, template, desc, type) => {
   };
 };
 
-const calculateSavedQuestionChance = async (name) => {
+const calculateSavedQuestionChance = async (id) => {
   const questionsAsked = await User.findOne({
-    where: { name },
+    where: { id },
     include: {
       model: SavedQuestion,
     },

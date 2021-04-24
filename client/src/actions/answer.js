@@ -41,7 +41,7 @@ export const checkAnswer = () => {
       const { data } = question.id
         ? await axios
             .post(
-              `api/question/check-answer?questionId=${question.id}&answer=${answer.userAnswer}`,
+              `api/question/check-answer?userId=${user.id}&questionId=${question.id}&answer=${answer.userAnswer}`,
               { ...question }
             )
             .catch((err) => {
@@ -57,7 +57,12 @@ export const checkAnswer = () => {
 
       dispatch({
         type: SET_ANSWER,
-        payload: { ...data, loading: false, error: "" },
+        payload: {
+          userAnswer: "",
+          correctAnswer: "",
+          loading: false,
+          error: "",
+        },
       });
 
       const score = data.userAnswer === data.correctAnswer ? 100 : 0;

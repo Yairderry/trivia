@@ -4,8 +4,8 @@ import Login from "./components/Login";
 import Game from "./components/Game";
 
 function App() {
-  const { name } = useSelector((state) => state.user);
-  return <div className="App">{name ? <Game /> : <Login />}</div>;
+  const { playing } = useSelector((state) => state.user);
+  return <div className="App">{playing ? <Game /> : <Login />}</div>;
 }
 
 export default App;

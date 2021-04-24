@@ -3,11 +3,11 @@ import { SET_USER, SET_USER_LOADER, SET_USER_ERROR } from "../actions";
 const initialUserValue = {
   error: "",
   loading: false,
-  id: 1,
-  name: "yair",
-  score: 0,
-  playing: true,
-  strikes: 0,
+  id: null,
+  name: null,
+  score: null,
+  playing: false,
+  strikes: null,
 };
 
 const UserReducer = (state = initialUserValue, { type, payload }) => {
