@@ -16,7 +16,11 @@ export default function Question() {
       <div>{question}</div>
       <div>
         {options.map((option, i) => (
-          <Option key={i} option={option} />
+          <Option
+            key={i}
+            option={option}
+            answer={option === true ? true : option === false ? false : option}
+          />
         ))}
       </div>
     </div>

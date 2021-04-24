@@ -1,18 +1,14 @@
-import React, { useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { pickAnswer } from "../actions";
 
-export default function Option({ option }) {
+export default function Option({ option, answer }) {
   const dispatch = useDispatch();
-  const optionRef = useRef();
-  const answer = useSelector((state) => state.answer);
   return (
     <div
       className="option-question"
-      ref={optionRef}
       onClick={() => {
-        console.log(answer);
-        dispatch(pickAnswer(optionRef.current.innerText));
+        dispatch(pickAnswer(answer));
       }}
     >
       {option === true ? "true" : option === false ? "false" : option}

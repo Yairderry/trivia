@@ -35,7 +35,7 @@ export const checkAnswer = () => {
 
     const { user, question, answer } = getState();
 
-    if (!answer.userAnswer) return;
+    if (answer.userAnswer === undefined) return;
 
     try {
       const { data } = question.id
