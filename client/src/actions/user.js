@@ -37,13 +37,17 @@ export const createUser = (name) => {
   };
 };
 
-export const updateUserScore = (id, score) => {
-  return (dispatch) => {
-    if (!id || !score) return;
+export const updateUserScore = () => {
+  return (dispatch, getState) => {
+    const { user, answer } = getState();
+
+    if (!user.id || !answer.userAnswer || !answer.correctAnswer) return;
+
+    const score = answer.userAnswer === answer.correctAnswer ? 100 : 0;
 
     dispatch({ type: SET_USER_LOADER });
     axios
-      .post(`api/user/update-score?id=${id}&score=${score}`)
+      .post(`api/user/update-score?id=${user.id}&score=${score}`)
       .then((data) => dispatch({ type: SET_USER, payload: data.data }))
       .catch((err) => {
         return errorFade(dispatch, err.response.data);

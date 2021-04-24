@@ -3,7 +3,7 @@ import { SET_USER, SET_USER_LOADER, SET_USER_ERROR } from "../actions";
 const initialUserValue = {
   error: "",
   loading: false,
-  name: "",
+  name: "yair",
   score: 0,
   playing: true,
   strikes: 0,

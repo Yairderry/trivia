@@ -124,9 +124,10 @@ const checkAnswerType1 = async (answer, countries, columns, desc) => {
     limit: 1,
     attributes: ["country", columns],
   }).then((data) => data.toJSON());
+
   return {
-    correctAnswer: correctAnswer.answer,
-    UserAnswer: answer,
+    correctAnswer: expectedAnswer.country,
+    userAnswer: answer,
   };
 };
 
@@ -135,9 +136,10 @@ const checkAnswerType2 = async (answer, countries, columns) => {
     where: { id: countries[0] },
     attributes: [columns],
   }).then((data) => data.toJSON());
+
   return {
     correctAnswer: expectedAnswer[columns],
-    UserAnswer: answer,
+    userAnswer: answer,
   };
 };
 
@@ -150,7 +152,7 @@ const checkAnswerType3 = async (answer, countries, columns, desc) => {
 
   return {
     correctAnswer: expectedAnswer[0] > expectedAnswer[1],
-    UserAnswer: answer,
+    userAnswer: answer,
   };
 };
 
@@ -168,7 +170,7 @@ const checkAnswerType4 = async (answer, questionId) => {
       : expectedAnswer;
   return {
     correctAnswer: correctAnswer.answer,
-    UserAnswer: answer,
+    userAnswer: answer,
   };
 };
 /* checking users answer end*/
@@ -230,11 +232,11 @@ const generateQuestion = async () => {
 
     switch (type) {
       case 1:
-        return await questionType1(columns, template, desc);
+        return await questionType1(columns, template, desc, type);
       case 2:
-        return await questionType2(columns, template);
+        return await questionType2(columns, template, type);
       case 3:
-        return await questionType3(columns, template, desc);
+        return await questionType3(columns, template, desc, type);
     }
   } catch (err) {
     console.log("-------------generating question-------------");
@@ -242,7 +244,7 @@ const generateQuestion = async () => {
   }
 };
 
-const questionType1 = async (columns, question, desc) => {
+const questionType1 = async (columns, question, desc, type) => {
   const countries = await get2RandomCountries(columns);
   const country = countries[0].toJSON();
   const fakeAnswers = (
@@ -256,12 +258,13 @@ const questionType1 = async (columns, question, desc) => {
     countriesId: [...fakeAnswers.map((answer) => answer.id), country.id],
     columns,
     desc,
+    type,
     question,
     options,
   };
 };
 
-const questionType2 = async (columns, template) => {
+const questionType2 = async (columns, template, type) => {
   const countries = await get2RandomCountries(columns);
   const country = countries[0].toJSON();
   const question = template.replace("X", country.country);
@@ -275,12 +278,13 @@ const questionType2 = async (columns, template) => {
   return {
     countriesId: [country.id],
     columns,
+    type,
     question,
     options,
   };
 };
 
-const questionType3 = async (columns, template, desc) => {
+const questionType3 = async (columns, template, desc, type) => {
   const countries = await get2RandomCountries(columns);
   const country1 = countries[0].toJSON();
   const country2 = countries[1].toJSON();
@@ -290,6 +294,7 @@ const questionType3 = async (columns, template, desc) => {
     countriesId: [country1.id, country2.id],
     columns,
     desc,
+    type,
     question,
     options: [true, false],
   };

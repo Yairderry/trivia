@@ -1,4 +1,9 @@
-import { SET_ANSWER, SET_ANSWER_ERROR, SET_ANSWER_LOADER } from "../actions";
+import {
+  SET_ANSWER,
+  SET_ANSWER_ERROR,
+  SET_ANSWER_LOADER,
+  PICK_ANSWER,
+} from "../actions";
 
 const initialAnswerValue = {
   loading: false,
@@ -11,6 +16,10 @@ const AnswerReducer = (state = initialAnswerValue, { type, payload }) => {
   switch (type) {
     case SET_ANSWER:
       return payload;
+
+    case PICK_ANSWER:
+      state.userAnswer = payload;
+      return { ...state };
 
     case SET_ANSWER_LOADER:
       state.loading = true;

@@ -24,11 +24,11 @@ question.get("/new", async (req, res) => {
 question.post("/check-answer", async (req, res) => {
   try {
     const { answer, questionId } = req.query;
-    const { countries, columns, desc, type } = req.body;
+    const { countriesId, columns, desc, type } = req.body;
     const isCorrect = await checkAnswer(
       answer,
       Number(questionId),
-      countries,
+      countriesId,
       columns,
       desc,
       type
