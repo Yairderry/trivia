@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import Loader from "./Loader";
+import Loader from "../Loader";
 import Option from "./Option";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "../ErrorMessage";
 
 export default function Question() {
   const { question, options, loading, error } = useSelector(

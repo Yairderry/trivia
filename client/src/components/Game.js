@@ -1,19 +1,20 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getQuestion, checkAnswer } from "../actions";
-import Question from "./Question";
+import { getQuestion, checkAnswer, startBreak } from "../actions";
+import Question from "./Question/Question";
+import Rating from "./Rating/Rating";
 import Loader from "./Loader";
 import ErrorMessage from "./ErrorMessage";
 
 export default function Game() {
   const dispatch = useDispatch();
-  const { name, score, strikes, error, loading } = useSelector(
+  const { name, score, strikes, error, loading, onBreak } = useSelector(
     (state) => state.user
   );
 
   useEffect(() => {
     dispatch(getQuestion());
-  }, [score, strikes]);
+  }, [name]);
 
   return (
     <div>
@@ -25,13 +26,19 @@ export default function Game() {
         <span>Strikes: {strikes}</span>
       </div>
       <Question />
-      <button
-        onClick={() => {
-          dispatch(checkAnswer());
-        }}
-      >
-        Submit
-      </button>
+
+      {onBreak ? (
+        <Rating />
+      ) : (
+        <button
+          onClick={() => {
+            if (!onBreak) dispatch(checkAnswer());
+            dispatch(startBreak());
+          }}
+        >
+          Submit
+        </button>
+      )}
     </div>
   );
 }

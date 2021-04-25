@@ -1,12 +1,19 @@
-import { SET_USER, SET_USER_LOADER, SET_USER_ERROR } from "../actions";
+import {
+  SET_USER,
+  SET_USER_LOADER,
+  SET_USER_ERROR,
+  START_BREAK,
+  STOP_BREAK,
+} from "../actions";
 
 const initialUserValue = {
   error: "",
   loading: false,
-  id: null,
-  name: null,
+  id: 24,
+  name: "qwer",
   score: null,
-  playing: false,
+  playing: true,
+  onBreak: false,
   strikes: null,
 };
 
@@ -17,6 +24,14 @@ const UserReducer = (state = initialUserValue, { type, payload }) => {
 
     case SET_USER_LOADER:
       state.loading = true;
+      return { ...state };
+
+    case START_BREAK:
+      state.onBreak = true;
+      return { ...state };
+
+    case STOP_BREAK:
+      state.onBreak = false;
       return { ...state };
 
     case SET_USER_ERROR:

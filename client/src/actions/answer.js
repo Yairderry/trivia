@@ -70,7 +70,12 @@ export const checkAnswer = () => {
       dispatch({ type: "SET_USER_LOADER" });
       axios
         .put(`api/user/update-score?id=${user.id}&score=${score}`)
-        .then((data) => dispatch({ type: "SET_USER", payload: data.data }))
+        .then((data) =>
+          dispatch({
+            type: "SET_USER",
+            payload: { ...data.data, onBreak: true },
+          })
+        )
         .catch((err) => {
           errorFade(dispatch, err.response.data);
         });
