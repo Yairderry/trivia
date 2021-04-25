@@ -1,16 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import Star from "./Star";
 import { useDispatch } from "react-redux";
 import { stopBreak, getQuestion, resetAnswer } from "../../actions";
 
 export default function Rating() {
   const dispatch = useDispatch();
+  const [didRate, setDidRate] = useState(false);
+
   return (
     <div>
       <p>Did you like this question?</p>
       <div>
         {[1, 2, 3, 4, 5].map((rating, i) => (
-          <Star key={i} rating={rating} />
+          <Star
+            key={i}
+            rating={rating}
+            didRate={didRate}
+            setDidRate={setDidRate}
+          />
         ))}
       </div>
       <p>Rating questions helps us improve the user experience!</p>

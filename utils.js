@@ -143,14 +143,18 @@ const checkAnswerType2 = async (answer, countries, columns) => {
 
 const checkAnswerType3 = async (answer, countries, columns, desc) => {
   const expectedAnswer = await Country.findAll({
-    where: { [Op.or]: [countries.map((id) => ({ id }))] },
-    order: [[columns, desc ? "DESC" : "ASC"]],
-    attributes: [columns],
-  }).then((data) => data.map((ans) => ans.toJSON()[columns]));
-
+    where: { [Op.or]: countries.map((id) => ({ id })) },
+    attributes: ["country", columns],
+  }).then((data) => {
+    return data.map((ans) => ans.toJSON());
+  });
+  const answer1 = expectedAnswer[0][columns];
+  const answer2 = expectedAnswer[1][columns];
+  const userAnswer = answer === "true" ? true : false;
+  const correctAnswer = desc ? answer1 > answer2 : answer2 > answer1;
   return {
-    correctAnswer: expectedAnswer[0] > expectedAnswer[1],
-    userAnswer: answer,
+    correctAnswer,
+    userAnswer,
   };
 };
 
@@ -307,6 +311,8 @@ const calculateSavedQuestionChance = async (id) => {
     },
   });
 
+  if (questionsAsked === null) throw new Error("User not found");
+
   const questions = await SavedQuestion.findAndCountAll({
     where: {
       id: {
@@ -339,6 +345,7 @@ const randomQuestion = () => {
 const get2RandomCountries = (column) => {
   const list = Country.findAll({
     order: Sequelize.literal("rand()"),
+    group: column,
     limit: 2,
     attributes: ["id", column, "country"],
     where: { [Op.not]: { [column]: null } },
@@ -349,6 +356,7 @@ const get2RandomCountries = (column) => {
 const get3RandomAnswers = (column, id, option) => {
   const list = Country.findAll({
     order: Sequelize.literal("rand()"),
+    group: column,
     limit: 3,
     attributes: ["id", column, "country"],
     where: {

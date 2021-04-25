@@ -60,7 +60,10 @@ export const saveQuestion = (rating) => {
         ...savedQuestion,
       })
       .then(() => {
-        dispatch({ type: SET_QUESTION, payload: question });
+        dispatch({
+          type: SET_QUESTION,
+          payload: { ...question, loading: false },
+        });
       })
       .catch((err) => {
         errorFade(dispatch, err.message);
@@ -77,7 +80,12 @@ export const rateQuestion = (rating) => {
     dispatch({ type: SET_QUESTION_LOADER });
     axios
       .put(`api/question/rate?id=${question.id}&rating=${rating}`)
-      .then(() => dispatch({ type: SET_QUESTION, payload: question }))
+      .then(() =>
+        dispatch({
+          type: SET_QUESTION,
+          payload: { ...question, loading: false },
+        })
+      )
       .catch((err) => {
         errorFade(dispatch, err.response.data);
       });

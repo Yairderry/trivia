@@ -135,7 +135,7 @@ module.exports = {
         {
           template:
             "Does X have a more people in the ages between 0 and 14 than Y?",
-          columns: "density_pop",
+          columns: "age_0_to_14_years",
           type: 3,
           desc: true,
         },

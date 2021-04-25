@@ -11,13 +11,18 @@ const question = Router();
 question.get("/new", async (req, res) => {
   try {
     const { userId } = req.query;
-    if (!userId) throw Error("You need to enter user id!");
 
-    const question = await getQuestion(userId);
+    if (!Number(userId)) throw Error("You need to enter user id!");
+
+    const question = await getQuestion(Number(userId));
     res.json({ ...question, loading: false, error: "" });
   } catch (error) {
-    if (error.message === "You need to enter user name!")
+    if (error.message === "You need to enter user id!")
       return res.status(400).send(error.message);
+
+    if (error.message === "User not found")
+      return res.status(404).send(error.message);
+
     res.status(500).send(error.message);
   }
 });
@@ -37,7 +42,7 @@ question.post("/check-answer", async (req, res) => {
     );
     res.json({ ...isCorrect, loading: false, error: "" });
   } catch (error) {
-    console.log(err);
+    console.log(error);
     res.status(500).send(error.message);
   }
 });

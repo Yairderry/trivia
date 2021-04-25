@@ -7,23 +7,32 @@
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  width: 10vw;
-  padding: 5px;
+  width: 20vw;
+  padding: 20px;
   margin: auto;
   margin-top: 20px;
 }
 
+.info-user-username {
+  font-size: 30px;
+}
+
+.info-user-secondrow {
+  display: flex;
+  justify-content: space-around;
+}
+
 .question-section {
   border-radius: 10px;
-  background-color: rgb(0, 102, 255);
+  background-color: rgb(195, 219, 255);
   width: 30vw;
-  padding: 5px;
+  padding: 20px;
   margin: auto;
   margin-top: 5px;
 }
 
 .option-question {
-  background-color: rgb(105, 150, 218);
+  background-color: rgb(106, 166, 255);
   margin: auto;
   margin-top: 3px;
   width: 150px;
@@ -32,9 +41,10 @@
 }
 
 .option-question:hover {
-  background-color: rgb(64, 123, 211);
+  background-color: rgb(37, 124, 253);
 }
 
 .checked {
-  font-weight: 900;
+  font-weight: 700;
+  background-color: rgb(0, 102, 255);
 }

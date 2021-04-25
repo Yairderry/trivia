@@ -23,9 +23,11 @@ export default function Game() {
       <div className="info-user">
         {error && <ErrorMessage message={error} />}
         {loading && <Loader />}
-        <span>Username: {name}</span>
-        <span>Score: {score}</span>
-        <span>Strikes: {strikes}</span>
+        <span className="info-user-username">{name}</span>
+        <span className="info-user-secondrow">
+          <span>Score: {score}</span>
+          <span>Strikes: {strikes}</span>
+        </span>
       </div>
       <Question />
 
@@ -36,7 +38,6 @@ export default function Game() {
           onClick={() => {
             if (!onBreak) dispatch(checkAnswer());
             dispatch(startBreak());
-            console.log(answer);
           }}
         >
           Submit
