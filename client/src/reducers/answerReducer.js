@@ -3,6 +3,7 @@ import {
   SET_ANSWER_ERROR,
   SET_ANSWER_LOADER,
   PICK_ANSWER,
+  RESET_ANSWER,
 } from "../actions";
 
 const initialAnswerValue = {
@@ -19,6 +20,11 @@ const AnswerReducer = (state = initialAnswerValue, { type, payload }) => {
 
     case PICK_ANSWER:
       state.userAnswer = payload;
+      return { ...state };
+
+    case RESET_ANSWER:
+      state.userAnswer = "";
+      state.correctAnswer = "";
       return { ...state };
 
     case SET_ANSWER_LOADER:

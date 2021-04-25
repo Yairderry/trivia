@@ -2,6 +2,7 @@ import axios from "axios";
 
 export const SET_ANSWER = "SET_ANSWER";
 export const PICK_ANSWER = "PICK_ANSWER";
+export const RESET_ANSWER = "RESET_ANSWER";
 export const SET_ANSWER_ERROR = "SET_ANSWER_ERROR";
 export const SET_ANSWER_LOADER = "SET_ANSWER_LOADER";
 
@@ -17,6 +18,10 @@ export const pickAnswer = (payload) => ({
 
 export const setAnswerLoader = () => ({
   type: SET_ANSWER_LOADER,
+});
+
+export const resetAnswer = () => ({
+  type: RESET_ANSWER,
 });
 
 export const setAnswerError = (payload) => ({
@@ -58,8 +63,7 @@ export const checkAnswer = () => {
       dispatch({
         type: SET_ANSWER,
         payload: {
-          userAnswer: "",
-          correctAnswer: "",
+          ...data,
           loading: false,
           error: "",
         },

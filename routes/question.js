@@ -44,15 +44,12 @@ question.post("/check-answer", async (req, res) => {
 
 question.post("/save", async (req, res) => {
   try {
-    const { userId, rating } = req.query;
-    const { question } = req.body;
-    const savedQuestion = await saveQuestion(
-      Number(userId),
-      question,
-      Number(rating)
-    );
+    const { rating } = req.query;
+    console.log(req.body);
+    const savedQuestion = await saveQuestion(req.body, Number(rating));
     res.json({ ...savedQuestion, loading: false, error: "" });
   } catch (error) {
+    console.log(error);
     res.status(500).send(error.message);
   }
 });

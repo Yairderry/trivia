@@ -41,26 +41,29 @@ export const getQuestion = () => {
 
 export const saveQuestion = (rating) => {
   return (dispatch, getState) => {
-    const { user, question, answer } = getState();
+    const { question, answer } = getState();
     const savedQuestion = {
       question: question.question,
-      option_1: question.options[0],
-      option_2: question.options[1],
-      option_3: question.options[2],
-      option_4: question.options[3],
-      answer: answer.correctAnswer,
+      option_1: question.options[0].toString(),
+      option_2: question.options[1].toString(),
+      option_3: question.options[2] && question.options[2].toString(),
+      option_4: question.options[3] && question.options[3].toString(),
+      answer: answer.correctAnswer.toString(),
       isCorrect: answer.correctAnswer === answer.userAnswer,
     };
-    if (!user.id || rating) return;
+
+    if (!rating) return;
 
     dispatch({ type: SET_QUESTION_LOADER });
     axios
-      .post(`api/question/save?userId=${user.id}&rating=${rating}`, {
+      .post(`api/question/save?rating=${rating}`, {
         ...savedQuestion,
       })
-      .then((data) => dispatch({ type: SET_QUESTION, payload: data.data }))
+      .then(() => {
+        dispatch({ type: SET_QUESTION, payload: question });
+      })
       .catch((err) => {
-        errorFade(dispatch, err.response.data);
+        errorFade(dispatch, err.message);
       });
   };
 };
@@ -69,7 +72,7 @@ export const rateQuestion = (rating) => {
   return (dispatch, getState) => {
     const { question } = getState();
 
-    if (!question.id || rating) return;
+    if (!question.id || !rating) return;
 
     dispatch({ type: SET_QUESTION_LOADER });
     axios

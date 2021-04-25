@@ -20,7 +20,6 @@ const getQuestion = async (id) => {
 };
 
 const saveQuestion = async (
-  userId,
   { question, option_1, option_2, option_3, option_4, answer, isCorrect },
   rating
 ) => {
@@ -37,9 +36,7 @@ const saveQuestion = async (
     answeredWrong: !isCorrect ? 1 : 0,
   });
   const { id } = savedQuestion.toJSON();
-  const rated = await rateQuestion(id, rating);
-  const added = await UsersQuestions.create({ userId, savedQuestionId: id });
-  return added;
+  await rateQuestion(id, rating);
 };
 
 const rateQuestion = async (id, rating) => {

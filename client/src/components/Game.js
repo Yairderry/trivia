@@ -12,6 +12,8 @@ export default function Game() {
     (state) => state.user
   );
 
+  const answer = useSelector((state) => state.answer);
+
   useEffect(() => {
     dispatch(getQuestion());
   }, [name]);
@@ -34,6 +36,7 @@ export default function Game() {
           onClick={() => {
             if (!onBreak) dispatch(checkAnswer());
             dispatch(startBreak());
+            console.log(answer);
           }}
         >
           Submit

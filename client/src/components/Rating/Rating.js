@@ -1,7 +1,10 @@
 import React from "react";
 import Star from "./Star";
+import { useDispatch } from "react-redux";
+import { stopBreak, getQuestion, resetAnswer } from "../../actions";
 
 export default function Rating() {
+  const dispatch = useDispatch();
   return (
     <div>
       <p>Did you like this question?</p>
@@ -11,7 +14,15 @@ export default function Rating() {
         ))}
       </div>
       <p>Rating questions helps us improve the user experience!</p>
-      <button>Skip to the next question</button>
+      <button
+        onClick={() => {
+          dispatch(getQuestion());
+          dispatch(stopBreak());
+          dispatch(resetAnswer());
+        }}
+      >
+        Skip to the next question
+      </button>
     </div>
   );
 }
