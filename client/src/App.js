@@ -8,6 +8,7 @@ function App() {
   const { playing } = useSelector((state) => state.user);
   return (
     <div className="App">
+      <h1 className="logo">Mr. WorldWide</h1>
       {playing ? (
         <Game />
       ) : (

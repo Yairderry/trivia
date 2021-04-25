@@ -6,15 +6,16 @@ export default function Login() {
   const dispatch = useDispatch();
   const inputRef = useRef();
   return (
-    <div>
+    <div className="login">
       <p>Enter name here:</p>
-      <input ref={inputRef} />
+      <input className="input-name" ref={inputRef} />
       <button
+        className="start-btn"
         onClick={() => {
           dispatch(createUser(inputRef.current.value));
         }}
       >
-        Start
+        Start!
       </button>
     </div>
   );

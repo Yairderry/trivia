@@ -4,9 +4,11 @@ export default function User({ user }) {
   const { playing, name, score } = user;
   return (
     <div className="user-score-board">
-      <span>{name}</span>
-      <span>{score}</span>
-      <span>{playing ? "Still Playing" : "Final score"}</span>
+      <span className="user-name">{name}</span>
+      <span className="user-score">{score}</span>
+      <span className="user-playing">
+        {playing ? "Still Playing" : "Final score"}
+      </span>
     </div>
   );
 }

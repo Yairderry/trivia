@@ -2,19 +2,69 @@
   text-align: center;
 }
 
+.logo {
+  font-size: 50px;
+}
+
+/* login component start */
+.input-name {
+  width: 30vw;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 3px;
+  box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+}
+
+.input-name:hover,
+.submit-btn:hover,
+.skip-btn:hover {
+  background-color: rgb(197, 197, 197);
+}
+
+.submit-btn {
+  margin-top: 5px;
+}
+
+.start-btn,
+.submit-btn,
+.skip-btn {
+  width: 7vw;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 1px 2px 6px 0px rgba(0, 0, 0, 0.4);
+}
+
+.skip-btn {
+  width: 12vw;
+}
+
+.input-name:active,
+.input-name:focus,
+.start-btn:active {
+  outline: none;
+}
+/* login component end */
+
 .info-user {
-  background-color: green;
+  background-color: rgb(195, 219, 255);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  width: 20vw;
-  padding: 20px;
+  width: 30vw;
+  padding: 15px;
   margin: auto;
   margin-top: 20px;
 }
 
 .info-user-username {
   font-size: 30px;
+  font-weight: 700;
 }
 
 .info-user-secondrow {
@@ -29,6 +79,7 @@
   padding: 20px;
   margin: auto;
   margin-top: 5px;
+  position: relative;
 }
 
 .option-question {
@@ -49,22 +100,78 @@
   background-color: rgb(0, 102, 255);
 }
 
+.timer {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+
+/* rating start */
+.rating-star {
+  margin: 0px 3px;
+}
+.rating-glow {
+  color: rgba(255, 255, 129, 0.8);
+  text-shadow: 2px 2px 4px rgba(150, 150, 150, 1);
+}
+/* rating end */
+
+/* scoreboard start */
 .score-board {
   width: 50vw;
   margin: auto;
   border: black solid 3px;
   border-radius: 10px;
+  height: 50vh;
+  overflow-y: scroll;
 }
 
 .user-score-board {
   border: black solid 1px;
   display: flex;
-  justify-content: space-around;
   padding: 10px;
   background-color: white;
   opacity: 0.6;
+  border-right: solid black 3px;
 }
 
 .user-score-board:hover {
   opacity: 1;
 }
+
+.user-name {
+  flex: 3;
+}
+
+.user-score {
+  flex: 2;
+}
+
+.user-playing {
+  flex: 2;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  position: absolute;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(134, 134, 134);
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #2e2e2e;
+}
+/* scoreboard end */

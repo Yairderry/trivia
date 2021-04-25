@@ -24,5 +24,5 @@ export default function Timer() {
     };
   }, [timer.questionStart]);
 
-  return <div>{timer.timer}</div>;
+  return <div className="timer">00:{timer.timer}</div>;
 }

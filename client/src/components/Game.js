@@ -42,6 +42,7 @@ export default function Game() {
         <Rating />
       ) : (
         <button
+          className="submit-btn"
           onClick={() => {
             clearTimeout(timerRef[1]);
             clearInterval(timerRef[0]);
