@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import Star from "./Star";
 import { useDispatch } from "react-redux";
-import { stopBreak, getQuestion, resetAnswer } from "../../actions";
+import {
+  stopBreak,
+  getQuestion,
+  resetAnswer,
+  newQuestion,
+  startQuestion,
+} from "../../actions";
 
 export default function Rating() {
   const dispatch = useDispatch();
@@ -26,6 +32,8 @@ export default function Rating() {
           dispatch(getQuestion());
           dispatch(stopBreak());
           dispatch(resetAnswer());
+          dispatch(newQuestion());
+          dispatch(startQuestion());
         }}
       >
         Skip to the next question

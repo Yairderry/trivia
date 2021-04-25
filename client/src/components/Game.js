@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getQuestion, checkAnswer, startBreak } from "../actions";
+import {
+  getQuestion,
+  checkAnswer,
+  startBreak,
+  decreaseQuestionTime,
+  resetTimer,
+} from "../actions";
 import Question from "./Question/Question";
 import Rating from "./Rating/Rating";
 import Loader from "./Loader";
@@ -11,6 +17,8 @@ export default function Game() {
   const { name, score, strikes, error, loading, onBreak } = useSelector(
     (state) => state.user
   );
+
+  const { timerRef } = useSelector((state) => state.timer);
 
   useEffect(() => {
     dispatch(getQuestion());
@@ -36,6 +44,8 @@ export default function Game() {
           onClick={() => {
             if (!onBreak) dispatch(checkAnswer());
             dispatch(startBreak());
+            clearInterval(timerRef[0]);
+            clearTimeout(timerRef[1]);
           }}
         >
           Submit

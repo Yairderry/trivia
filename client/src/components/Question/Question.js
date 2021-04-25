@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Loader from "../Loader";
 import Option from "./Option";
+import Timer from "./Timer";
 import ErrorMessage from "../ErrorMessage";
 
 export default function Question() {
@@ -11,6 +12,7 @@ export default function Question() {
 
   return (
     <div className="question-section">
+      <Timer />
       {error && <ErrorMessage message={error} />}
       {loading && <Loader />}
       <div>{question}</div>

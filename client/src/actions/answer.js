@@ -69,7 +69,12 @@ export const checkAnswer = () => {
         },
       });
 
-      const score = data.userAnswer === data.correctAnswer ? 100 : 0;
+      const [score, type] =
+        data.userAnswer === data.correctAnswer
+          ? [100, "DECREASE_QUESTION_TIME"]
+          : [0, ""];
+
+      if (type) dispatch({ type });
 
       dispatch({ type: "SET_USER_LOADER" });
       axios
@@ -86,5 +91,26 @@ export const checkAnswer = () => {
     } catch (err) {
       errorFade(dispatch, err.response.data);
     }
+  };
+};
+
+export const failedToAnswer = () => {
+  return async (dispatch, getState) => {
+    dispatch({ type: SET_ANSWER_LOADER });
+
+    const { user } = getState();
+
+    dispatch({ type: "SET_USER_LOADER" });
+    axios
+      .put(`api/user/update-score?id=${user.id}&score=${0}`)
+      .then((data) =>
+        dispatch({
+          type: "SET_USER",
+          payload: { ...data.data, onBreak: true },
+        })
+      )
+      .catch((err) => {
+        errorFade(dispatch, err.response.data);
+      });
   };
 };
