@@ -4,8 +4,8 @@ import {
   getQuestion,
   checkAnswer,
   startBreak,
-  decreaseQuestionTime,
-  resetTimer,
+  endQuestion,
+  startQuestion,
 } from "../actions";
 import Question from "./Question/Question";
 import Rating from "./Rating/Rating";
@@ -22,6 +22,7 @@ export default function Game() {
 
   useEffect(() => {
     dispatch(getQuestion());
+    dispatch(startQuestion());
   }, [name]);
 
   return (
@@ -42,10 +43,11 @@ export default function Game() {
       ) : (
         <button
           onClick={() => {
+            clearTimeout(timerRef[1]);
+            clearInterval(timerRef[0]);
+            dispatch(endQuestion());
             if (!onBreak) dispatch(checkAnswer());
             dispatch(startBreak());
-            clearInterval(timerRef[0]);
-            clearTimeout(timerRef[1]);
           }}
         >
           Submit

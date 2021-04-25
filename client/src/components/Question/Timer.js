@@ -20,6 +20,7 @@ export default function Timer() {
 
     return () => {
       clearTimeout(questionTimer);
+      clearInterval(tick);
     };
   }, [timer.questionStart]);
 

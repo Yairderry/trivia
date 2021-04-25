@@ -38,7 +38,7 @@ export const checkAnswer = () => {
   return async (dispatch, getState) => {
     dispatch({ type: SET_ANSWER_LOADER });
 
-    const { user, question, answer } = getState();
+    const { user, question, answer, timer } = getState();
 
     if (answer.userAnswer === undefined) return;
 
@@ -69,9 +69,14 @@ export const checkAnswer = () => {
         },
       });
 
+      const scoreByTime =
+        (1 - (timer.questionEnd - timer.questionStart) / timer.questionTime) *
+          70 +
+        30;
+
       const [score, type] =
         data.userAnswer === data.correctAnswer
-          ? [100, "DECREASE_QUESTION_TIME"]
+          ? [scoreByTime, "DECREASE_QUESTION_TIME"]
           : [0, ""];
 
       if (type) dispatch({ type });
