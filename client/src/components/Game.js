@@ -12,8 +12,6 @@ export default function Game() {
     (state) => state.user
   );
 
-  const answer = useSelector((state) => state.answer);
-
   useEffect(() => {
     dispatch(getQuestion());
   }, [name]);

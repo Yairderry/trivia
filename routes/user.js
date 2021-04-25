@@ -8,8 +8,12 @@ user.use(express.json());
 
 user.get("/scoreboard", async (req, res) => {
   try {
-    const scoreboard = await getScoreboard();
-    res.json({ ...scoreboard, loading: false, error: "" });
+    const scoreboard = (await getScoreboard()).map((user) => {
+      delete user.strikes;
+      return user;
+    });
+
+    res.json({ scoreboard, loading: false, error: "" });
   } catch (error) {
     res.status(500).send(error.message);
   }

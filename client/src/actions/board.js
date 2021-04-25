@@ -27,10 +27,10 @@ export const getScoreboard = () => {
   return (dispatch) => {
     dispatch({ type: SET_BOARD_LOADER });
     axios
-      .post("api/user/scoreboard")
+      .get("api/user/scoreboard")
       .then((data) => dispatch({ type: SET_BOARD, payload: data.data }))
       .catch((err) => {
-        errorFade(dispatch, err.response.data);
+        errorFade(dispatch, err.message);
       });
   };
 };

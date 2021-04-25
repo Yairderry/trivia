@@ -83,7 +83,7 @@ const updateScore = async (id, score) => {
 const getScoreboard = async () => {
   const users = await User.findAll({
     order: [["score", "DESC"]],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
+    attributes: { exclude: ["id", "createdAt", "updatedAt"] },
   });
   return users.map((user) => user.toJSON());
 };

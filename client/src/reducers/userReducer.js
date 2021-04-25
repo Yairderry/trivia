@@ -9,10 +9,10 @@ import {
 const initialUserValue = {
   error: "",
   loading: false,
-  id: 24,
-  name: "qwer",
+  id: 0,
+  name: "",
   score: null,
-  playing: true,
+  playing: false,
   onBreak: false,
   strikes: null,
 };
