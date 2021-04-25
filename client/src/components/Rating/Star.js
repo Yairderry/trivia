@@ -13,7 +13,6 @@ export default function Star({ rating, didRate, setDidRate }) {
   }, [id]);
 
   const rateOrSaveQuestion = () => {
-    console.log(didRate);
     if (!didRate) {
       id ? dispatch(rateQuestion(rating)) : dispatch(saveQuestion(rating));
       setDidRate(true);

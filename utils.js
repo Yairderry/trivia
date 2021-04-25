@@ -144,7 +144,7 @@ const checkAnswerType2 = async (answer, countries, columns) => {
 const checkAnswerType3 = async (answer, countries, columns, desc) => {
   const expectedAnswer = await Country.findAll({
     where: { [Op.or]: countries.map((id) => ({ id })) },
-    attributes: ["country", columns],
+    attributes: ["id", columns],
   }).then((data) => {
     return data.map((ans) => ans.toJSON());
   });
@@ -289,10 +289,17 @@ const questionType2 = async (columns, template, type) => {
 
 const questionType3 = async (columns, template, desc, type) => {
   const countries = await get2RandomCountries(columns);
-  const country1 = countries[0].toJSON();
-  const country2 = countries[1].toJSON();
-  let question = template.replace("Y", country2.country);
-  question = question.replace("X", country1.country);
+
+  const orderedCountries = countries
+    .map((country) => country.toJSON())
+    .sort((a, b) => a.id - b.id);
+
+  const country1 = orderedCountries[0];
+  const country2 = orderedCountries[1];
+
+  let question = template.replace("X", country1.country);
+  question = question.replace("Y", country2.country);
+
   return {
     countriesId: [country1.id, country2.id],
     columns,

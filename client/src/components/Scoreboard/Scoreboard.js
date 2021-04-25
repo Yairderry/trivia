@@ -13,12 +13,15 @@ export default function Scoreboard() {
     dispatch(getScoreboard());
   }, [playing]);
   return (
-    <div>
+    <div className="score-board-section">
+      <h1>score board</h1>
       {error && <ErrorMessage message={error} />}
       {loading && <Loader />}
-      {scoreboard.map((user, i) => (
-        <User key={i} user={user} />
-      ))}
+      <div className="score-board">
+        {scoreboard.map((user, i) => (
+          <User key={i} user={user} />
+        ))}
+      </div>
     </div>
   );
 }
