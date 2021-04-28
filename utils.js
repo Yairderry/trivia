@@ -68,6 +68,15 @@ const createUser = async (name) => {
   return userData;
 };
 
+const getUser = async (id) => {
+  const user = await User.findOne({
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+    where: { id },
+  });
+  if (!user) throw new Error("User Not Found");
+  return user.toJSON();
+};
+
 const updateScore = async (id, score) => {
   score === 0
     ? await User.increment("strikes", {
@@ -393,25 +402,6 @@ const shuffleArray = (array) => {
   }
 };
 
-const exampleUser = {
-  name: "daniel",
-  email: "daniel@gmail.com",
-  password: "daniel123",
-};
-const exampleUser3 = {
-  name: "yair",
-  email: "yair@gmail.com",
-  password: "yair123",
-};
-const exampleUser2 = {
-  email: "daniel@gmail.com",
-  password: "daniel123",
-};
-const exampleUser4 = {
-  email: "yair@gmail.com",
-  password: "yair123",
-};
-
 const register = async (user) => {
   user.password = hashSync(user.password, genSaltSync(10));
   const registerUser = await UsersCredentials.findAll({
@@ -445,7 +435,7 @@ const login = async (user) => {
       { result: { email, name, userId } },
       process.env.JWT_CODE,
       {
-        expiresIn: "160s",
+        expiresIn: "10m",
       }
     );
 
@@ -474,30 +464,30 @@ const logout = async (refreshToken) => {
   }
 };
 
-// register(exampleUser3)
-//   .then((data) => console.log(data.toJSON()))
-//   .catch((err) => console.log(err));
+const newToken = async (refreshToken, user) => {
+  const tokens = await RefreshTokens.findAll({
+    where: { token: refreshToken },
+  });
+  if (tokens.length === 0) throw new Error("Refresh Token Not Found");
 
-// login(exampleUser2)
-//   .then((data) => console.log(data))
-//   .catch((err) => console.log(err));
+  const accessToken = sign({ result: user }, process.env.JWT_CODE, {
+    expiresIn: "10m",
+  });
 
-// logout(
-//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXN1bHQiOnsiZW1haWwiOiJkYW5pZWxAZ21haWwuY29tIiwibmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MTAzfSwiaWF0IjoxNjE5NjIwMzA5LCJleHAiOjE2MjAyMjUxMDl9.h4jSk-Hu7tCRv1DnkDtxSlbXHGGVz1ZYRuaGzxKVlzU"
-// )
-//   .then((data) => console.log(data))
-//   .catch((err) => console.log(err));
+  return accessToken;
+};
 
 module.exports = {
   getQuestion,
+  getUser,
   getScoreboard,
   saveQuestion,
   rateQuestion,
-  createUser,
   updateScore,
   checkAnswer,
   endGameFor,
   login,
   logout,
   register,
+  newToken,
 };
