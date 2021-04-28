@@ -42,7 +42,6 @@ question.post("/check-answer", async (req, res) => {
     );
     res.json({ ...isCorrect, loading: false, error: "" });
   } catch (error) {
-    console.log(error);
     res.status(500).send(error.message);
   }
 });
@@ -54,7 +53,6 @@ question.post("/save", async (req, res) => {
     const savedQuestion = await saveQuestion(req.body, Number(rating));
     res.json({ ...savedQuestion, loading: false, error: "" });
   } catch (error) {
-    console.log(error);
     res.status(500).send(error.message);
   }
 });

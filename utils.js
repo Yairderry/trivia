@@ -1,12 +1,18 @@
+require("dotenv").config();
 const {
   UsersQuestions,
   User,
   SavedQuestion,
+  UsersCredentials,
   Country,
   Question,
+  RefreshTokens,
 } = require("./models");
 const Sequelize = require("sequelize");
 const { Op } = require("sequelize");
+const { hashSync, genSaltSync, compareSync } = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { sign } = jwt;
 
 const getQuestion = async (id) => {
   const chance = await calculateSavedQuestionChance(id);
@@ -257,13 +263,13 @@ const questionType1 = async (columns, question, desc, type) => {
     ...fakeAnswers.map((answer) => answer.country),
     country.country,
   ];
+  shuffleArray(options);
   return {
     countriesId: [...fakeAnswers.map((answer) => answer.id), country.id],
     columns,
     desc,
     type,
     question,
-    options,
   };
 };
 
@@ -278,6 +284,7 @@ const questionType2 = async (columns, template, type) => {
     ...fakeAnswers.map((answer) => answer[columns]),
     country[columns],
   ];
+  shuffleArray(options);
   return {
     countriesId: [country.id],
     columns,
@@ -386,6 +393,101 @@ const shuffleArray = (array) => {
   }
 };
 
+const exampleUser = {
+  name: "daniel",
+  email: "daniel@gmail.com",
+  password: "daniel123",
+};
+const exampleUser3 = {
+  name: "yair",
+  email: "yair@gmail.com",
+  password: "yair123",
+};
+const exampleUser2 = {
+  email: "daniel@gmail.com",
+  password: "daniel123",
+};
+const exampleUser4 = {
+  email: "yair@gmail.com",
+  password: "yair123",
+};
+
+const register = async (user) => {
+  user.password = hashSync(user.password, genSaltSync(10));
+  const registerUser = await UsersCredentials.findAll({
+    where: { email: user.email },
+  });
+
+  if (registerUser.length !== 0) throw new Error("This email already exists");
+
+  const newUser = await createUser(user.name);
+  await UsersCredentials.create({ ...user, userId: newUser.id });
+  return newUser;
+};
+
+const login = async (user) => {
+  const loginUser = await UsersCredentials.findOne({
+    where: { email: user.email },
+  });
+
+  if (!loginUser) throw new Error("Cannot find user");
+
+  if (!compareSync(user.password, loginUser.password))
+    throw new Error("User or Password incorrect");
+
+  const { email, name, userId } = loginUser;
+  const token = await RefreshTokens.findOne({ where: { userId } });
+
+  if (token) {
+    throw new Error("User already logged in");
+  } else {
+    const accessToken = sign(
+      { result: { email, name, userId } },
+      process.env.JWT_CODE,
+      {
+        expiresIn: "160s",
+      }
+    );
+
+    const refreshToken = sign(
+      { result: { email, name, userId } },
+      process.env.JWT_REFRESH_CODE,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    await RefreshTokens.create({ token: refreshToken, userId });
+    return { email, name, userId, accessToken, refreshToken };
+  }
+};
+
+const logout = async (refreshToken) => {
+  if (!refreshToken) {
+    throw new Error("Refresh Token Required");
+  } else {
+    const logout = await RefreshTokens.destroy({
+      where: { token: refreshToken },
+    });
+
+    return logout;
+  }
+};
+
+// register(exampleUser3)
+//   .then((data) => console.log(data.toJSON()))
+//   .catch((err) => console.log(err));
+
+// login(exampleUser2)
+//   .then((data) => console.log(data))
+//   .catch((err) => console.log(err));
+
+// logout(
+//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXN1bHQiOnsiZW1haWwiOiJkYW5pZWxAZ21haWwuY29tIiwibmFtZSI6ImRhbmllbCIsInVzZXJJZCI6MTAzfSwiaWF0IjoxNjE5NjIwMzA5LCJleHAiOjE2MjAyMjUxMDl9.h4jSk-Hu7tCRv1DnkDtxSlbXHGGVz1ZYRuaGzxKVlzU"
+// )
+//   .then((data) => console.log(data))
+//   .catch((err) => console.log(err));
+
 module.exports = {
   getQuestion,
   getScoreboard,
@@ -395,4 +497,7 @@ module.exports = {
   updateScore,
   checkAnswer,
   endGameFor,
+  login,
+  logout,
+  register,
 };
