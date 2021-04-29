@@ -34,7 +34,7 @@ export const getQuestion = () => {
       .get(`api/question/new?userId=${user.id}`)
       .then((data) => dispatch({ type: SET_QUESTION, payload: data.data }))
       .catch((err) => {
-        errorFade(dispatch, err.response.data);
+        errorFade(dispatch, err.message);
       });
   };
 };

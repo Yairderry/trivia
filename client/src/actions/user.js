@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios from "../Network/NetworkWrapper";
+import Cookies from "js-cookie";
 
 export const SET_USER = "SET_USER";
 export const START_BREAK = "START_BREAK";
@@ -33,18 +34,38 @@ const errorFade = (dispatch, message) => {
   setTimeout(() => dispatch({ type: SET_USER_ERROR, payload: "" }), 3000);
 };
 
-export const createUser = (name) => {
-  return (dispatch) => {
-    if (!name) return;
-
+export const getUser = () => {
+  return (dispatch, getState) => {
     dispatch({ type: SET_USER_LOADER });
     axios
-      .post(`api/user/new?userName=${name}`)
+      .get(`api/user`)
       .then((data) =>
         dispatch({ type: SET_USER, payload: { ...data.data, onBreak: false } })
       )
       .catch((err) => {
-        errorFade(dispatch, err.response.data);
+        errorFade(dispatch, err.message);
+      });
+  };
+};
+
+export const loginUser = (user) => {
+  return (dispatch) => {
+    dispatch({ type: SET_USER_LOADER });
+    axios
+      .post(`api/user/login`, user)
+      .then((data) => {
+        Cookies.set("accessToken", `Bearer ${data.data.accessToken}`, {
+          expires: 1,
+        });
+        Cookies.set("refreshToken", data.data.refreshToken, { expires: 1 });
+        dispatch({
+          type: SET_USER,
+          payload: { ...data.data.userData, onBreak: false },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        errorFade(dispatch, err.message);
       });
   };
 };

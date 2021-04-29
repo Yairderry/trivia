@@ -63,8 +63,8 @@ const rateQuestion = async (id, rating) => {
 const createUser = async (name) => {
   const user = await User.create({ name, score: 0, strikes: 0 });
   const userData = user.toJSON();
-  delete userData.createdAt;
-  delete userData.updatedAt;
+  userData.createdAt = undefined;
+  userData.updatedAt = undefined;
   return userData;
 };
 
@@ -233,11 +233,11 @@ const getSavedQuestion = async (id) => {
   const { option_1, option_2, option_3, option_4 } = pickedQuestion;
   pickedQuestion.options = [option_1, option_2];
   option_3 && option_4 && pickedQuestion.options.push(option_3, option_4);
-  delete pickedQuestion.rating,
-    delete pickedQuestion.option_1,
-    delete pickedQuestion.option_2,
-    delete pickedQuestion.option_3,
-    delete pickedQuestion.option_4;
+  pickedQuestion.rating = undefined;
+  pickedQuestion.option_1 = undefined;
+  pickedQuestion.option_2 = undefined;
+  pickedQuestion.option_3 = undefined;
+  pickedQuestion.option_4 = undefined;
   return pickedQuestion;
 };
 
@@ -416,9 +416,11 @@ const register = async (user) => {
 };
 
 const login = async (user) => {
-  const loginUser = await UsersCredentials.findOne({
+  const loginData = await UsersCredentials.findOne({
     where: { email: user.email },
   });
+
+  const loginUser = loginData.toJSON();
 
   if (!loginUser) throw new Error("Cannot find user");
 
@@ -435,7 +437,7 @@ const login = async (user) => {
       { result: { email, name, userId } },
       process.env.JWT_CODE,
       {
-        expiresIn: "10m",
+        expiresIn: "1m",
       }
     );
 
@@ -447,8 +449,10 @@ const login = async (user) => {
       }
     );
 
+    const userData = await getUser(userId);
+
     await RefreshTokens.create({ token: refreshToken, userId });
-    return { email, name, userId, accessToken, refreshToken };
+    return { userData, accessToken, refreshToken };
   }
 };
 
@@ -464,17 +468,24 @@ const logout = async (refreshToken) => {
   }
 };
 
-const newToken = async (refreshToken, user) => {
-  const tokens = await RefreshTokens.findAll({
+const newToken = async (refreshToken) => {
+  const data = await RefreshTokens.findOne({
     where: { token: refreshToken },
+    attributes: ["token"],
   });
-  if (tokens.length === 0) throw new Error("Refresh Token Not Found");
+  if (!data) throw new Error("Refresh Token Not Found");
+  const token = data.toJSON().token;
 
-  const accessToken = sign({ result: user }, process.env.JWT_CODE, {
-    expiresIn: "10m",
+  return jwt.verify(token, process.env.JWT_REFRESH_CODE, (err, authData) => {
+    if (err) throw new Error("Invalid refresh Token");
+
+    const user = authData.result;
+    const accessToken = sign({ result: user }, process.env.JWT_CODE, {
+      expiresIn: "1m",
+    });
+
+    return accessToken;
   });
-
-  return accessToken;
 };
 
 module.exports = {

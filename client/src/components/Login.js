@@ -1,21 +1,31 @@
 import React, { useRef } from "react";
 import { useDispatch } from "react-redux";
-import { createUser } from "../actions";
+import { loginUser } from "../actions";
 
 export default function Login() {
   const dispatch = useDispatch();
-  const inputRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
   return (
     <div className="login">
       <p>Enter name here:</p>
-      <input className="input-name" ref={inputRef} />
+      <input type="email" className="input-name" ref={emailRef} />
+      <input type="password" className="input-password" ref={passwordRef} />
       <button
         className="start-btn"
         onClick={() => {
-          dispatch(createUser(inputRef.current.value));
+          dispatch(
+            loginUser({
+              email: emailRef.current.value,
+              password: passwordRef.current.value,
+            })
+          );
         }}
       >
-        Start!
+        login!
+      </button>
+      <button className="register-btn" onClick={() => {}}>
+        Register
       </button>
     </div>
   );

@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const express = require("express");
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
+// const jwt = require("jsonwebtoken");
+// const cookieParser = require("cookie-parser");
 const {
   getScoreboard,
   updateScore,
@@ -16,7 +16,6 @@ const { validateToken } = require("./middlewares/validateToken");
 const user = Router();
 
 user.use(express.json());
-user.use(cookieParser());
 
 user.get("/", validateToken, async (req, res) => {
   try {
@@ -26,8 +25,8 @@ user.get("/", validateToken, async (req, res) => {
 
     res.json({ ...userData, loading: false, error: "" });
   } catch (error) {
-    if (err.message === "User Not Found")
-      return res.status(404).send(err.message);
+    if (error.message === "User Not Found")
+      return res.status(404).send(error.message);
 
     return res.status(500).send(error.message);
   }
@@ -36,7 +35,7 @@ user.get("/", validateToken, async (req, res) => {
 user.get("/scoreboard", async (req, res) => {
   try {
     const scoreboard = (await getScoreboard()).map((user) => {
-      delete user.strikes;
+      user.strikes = undefined;
       return user;
     });
 
@@ -45,16 +44,6 @@ user.get("/scoreboard", async (req, res) => {
     res.status(500).send(error.message);
   }
 });
-
-// user.post("/new", async (req, res) => {
-//   try {
-//     const { userName } = req.query;
-//     const userCreated = await createUser(userName);
-//     res.json({ ...userCreated, loading: false, error: "" });
-//   } catch (error) {
-//     res.status(500).send(error.message);
-//   }
-// });
 
 user.put("/update-score", async (req, res) => {
   try {
@@ -69,10 +58,9 @@ user.put("/update-score", async (req, res) => {
 user.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const tokens = await login({ email, password });
-    res.cookie("accessToken", tokens.accessToken, { httpOnly: true });
-    res.cookie("refreshToken", tokens.refreshToken, { httpOnly: true });
-    res.json(tokens);
+    const userData = await login({ email, password });
+    res.cookie("refreshToken", userData.refreshToken);
+    res.json(userData);
   } catch (err) {
     if (err.message === "User or Password incorrect")
       return res.status(401).send(err.message);
@@ -114,16 +102,21 @@ user.post("/logout", async (req, res) => {
 });
 
 user.post("/new-token", async (req, res) => {
-  const { refreshToken, user } = req.body;
-  if (!refreshToken) return res.status(401).send("Refresh Token Required");
-  try {
-    const accessToken = await newToken(refreshToken, user);
+  const { refreshToken } = req.body;
 
-    res.cookie("accessToken", accessToken, { httpOnly: true });
-    res.json(accessToken);
+  try {
+    const accessToken = await newToken(refreshToken);
+    console.log(accessToken);
+
+    if (accessToken instanceof Error) throw accessToken;
+
+    res.json({ accessToken });
   } catch (err) {
     if (err.message === "Refresh Token Not Found")
       return res.status(404).send(err.message);
+
+    // if (err.message === "Invalid refresh Token")
+    //   return res.status(403).send(err.message);
 
     return res.status(500).send(err.message);
   }
