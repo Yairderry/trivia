@@ -8,9 +8,18 @@ export default function Login() {
   const passwordRef = useRef();
   return (
     <div className="login">
-      <p>Enter name here:</p>
-      <input type="email" className="input-name" ref={emailRef} />
-      <input type="password" className="input-password" ref={passwordRef} />
+      <input
+        type="email"
+        className="input-name"
+        ref={emailRef}
+        placeholder="enter your email"
+      />
+      <input
+        type="password"
+        className="input-name"
+        ref={passwordRef}
+        placeholder="enter your password"
+      />
       <button
         className="start-btn"
         onClick={() => {
@@ -22,10 +31,7 @@ export default function Login() {
           );
         }}
       >
-        login!
-      </button>
-      <button className="register-btn" onClick={() => {}}>
-        Register
+        Login
       </button>
     </div>
   );

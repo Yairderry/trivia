@@ -106,7 +106,6 @@ user.post("/new-token", async (req, res) => {
 
   try {
     const accessToken = await newToken(refreshToken);
-    console.log(accessToken);
 
     if (accessToken instanceof Error) throw accessToken;
 
