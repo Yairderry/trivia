@@ -4,6 +4,7 @@ import {
   SET_USER_ERROR,
   START_BREAK,
   STOP_BREAK,
+  CLEAR_USER,
 } from "../actions";
 
 const initialUserValue = {
@@ -21,6 +22,9 @@ const UserReducer = (state = initialUserValue, { type, payload }) => {
   switch (type) {
     case SET_USER:
       return payload;
+
+    case CLEAR_USER:
+      return initialUserValue;
 
     case SET_USER_LOADER:
       state.loading = true;

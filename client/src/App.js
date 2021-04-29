@@ -22,7 +22,7 @@ function App() {
     <div className="App">
       <h1 className="logo">Mr. WorldWide</h1>
       <BrowserRouter>
-        {id !== 0 ? <Redirect to="/lobby" /> : <Redirect to="/" />}
+        {id ? <Redirect to="/lobby" /> : <Redirect to="/" />}
         <Switch>
           <Route exact path="/" component={Home} />
           <Route exact path="/register" component={Register} />

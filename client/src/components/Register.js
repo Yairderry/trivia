@@ -1,9 +1,12 @@
 import React, { useRef } from "react";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../actions";
 
 export default function Register() {
   const nameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
+  const dispatch = useDispatch();
   return (
     <div>
       <input
@@ -24,7 +27,18 @@ export default function Register() {
         ref={passwordRef}
         placeholder="enter your password"
       />
-      <button className="submit-btn" onClick={() => {}}>
+      <button
+        className="submit-btn"
+        onClick={() => {
+          dispatch(
+            registerUser({
+              name: nameRef.current.value,
+              email: emailRef.current.value,
+              password: passwordRef.current.value,
+            })
+          );
+        }}
+      >
         Register
       </button>
     </div>

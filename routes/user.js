@@ -79,7 +79,7 @@ user.post("/register", async (req, res) => {
     res.json({ ...user, loading: false, error: "" });
   } catch (err) {
     if (err.message === "This email already exists")
-      return res.status(403).send(err.message);
+      return res.status(401).send(err.message);
 
     return res.status(500).send(err.message);
   }
@@ -113,9 +113,6 @@ user.post("/new-token", async (req, res) => {
   } catch (err) {
     if (err.message === "Refresh Token Not Found")
       return res.status(404).send(err.message);
-
-    // if (err.message === "Invalid refresh Token")
-    //   return res.status(403).send(err.message);
 
     return res.status(500).send(err.message);
   }
