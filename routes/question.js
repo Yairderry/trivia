@@ -8,6 +8,8 @@ const {
 
 const question = Router();
 
+// TODO:add validate token middleware
+
 question.get("/new", async (req, res) => {
   try {
     const { userId } = req.query;

@@ -97,8 +97,8 @@ const updateScore = async (id, score) => {
 
 const getScoreboard = async () => {
   const users = await User.findAll({
-    order: [["score", "DESC"]],
-    attributes: { exclude: ["id", "createdAt", "updatedAt"] },
+    order: [["top_score", "DESC"]],
+    attributes: { exclude: ["score", "createdAt", "updatedAt"] },
   });
   return users.map((user) => user.toJSON());
 };
@@ -124,9 +124,29 @@ const checkAnswer = async (
   }
 };
 
-const endGameFor = async (userId) => {
-  const endGame = await UsersQuestions.destroy({ where: { userId } });
-  return endGame;
+const endGameFor = async (userId, score, topScore) => {
+  if (!Number.isInteger(score) || !Number.isInteger(topScore))
+    throw new Error("No hacking!");
+  const user = await User.update(
+    {
+      score: 0,
+      strikes: 0,
+      topScore: Sequelize.literal(score > topScore ? `${score}` : "top_score"),
+    },
+    {
+      where: { id: userId },
+    }
+  );
+
+  if (!user[0]) throw new Error("User not found");
+
+  await UsersQuestions.destroy({ where: { userId } });
+  const updatedUser = await User.findOne({
+    where: { id: userId },
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+
+  return updatedUser.toJSON();
 };
 
 /* checking users answer start*/
@@ -257,7 +277,6 @@ const generateQuestion = async () => {
         return await questionType3(columns, template, desc, type);
     }
   } catch (err) {
-    console.log("-------------generating question-------------");
     console.log(err);
   }
 };
@@ -420,9 +439,9 @@ const login = async (user) => {
     where: { email: user.email },
   });
 
-  const loginUser = loginData.toJSON();
+  if (!loginData) throw new Error("Cannot find user");
 
-  if (!loginUser) throw new Error("Cannot find user");
+  const loginUser = loginData.toJSON();
 
   if (!compareSync(user.password, loginUser.password))
     throw new Error("User or Password incorrect");

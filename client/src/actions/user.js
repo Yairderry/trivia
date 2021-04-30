@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 export const SET_USER = "SET_USER";
 export const CLEAR_USER = "CLEAR_USER";
+export const START_NEW_GAME = "START_NEW_GAME";
 export const START_BREAK = "START_BREAK";
 export const STOP_BREAK = "STOP_BREAK";
 export const SET_USER_ERROR = "SET_USER_ERROR";
@@ -15,6 +16,10 @@ export const setUser = (payload) => ({
 
 export const setUserLoader = () => ({
   type: SET_USER_LOADER,
+});
+
+export const startNewGame = () => ({
+  type: START_NEW_GAME,
 });
 
 export const clearUser = () => ({
@@ -48,29 +53,50 @@ export const getUser = () => {
         dispatch({ type: SET_USER, payload: { ...data.data, onBreak: false } })
       )
       .catch((err) => {
-        errorFade(dispatch, err.message);
+        errorFade(dispatch, err.response.data);
       });
   };
 };
 
-export const loginUser = (user) => {
-  return (dispatch) => {
+export const endGame = () => {
+  return async (dispatch, getState) => {
     dispatch({ type: SET_USER_LOADER });
-    axios
-      .post(`api/user/login`, user)
-      .then((data) => {
-        Cookies.set("accessToken", `Bearer ${data.data.accessToken}`, {
-          expires: 1,
-        });
-        Cookies.set("refreshToken", data.data.refreshToken, { expires: 1 });
-        dispatch({
-          type: SET_USER,
-          payload: { ...data.data.userData, onBreak: false },
-        });
-      })
-      .catch((err) => {
-        errorFade(dispatch, err.message);
+    const { score, id, topScore } = getState().user;
+    try {
+      const data = await axios.put(`api/user/end-game`, {
+        id,
+        score,
+        topScore,
       });
+
+      if (data instanceof Error) throw data;
+
+      dispatch({ type: SET_USER, payload: { ...data.data, onBreak: false } });
+    } catch (err) {
+      errorFade(dispatch, err.response.data);
+    }
+  };
+};
+
+export const loginUser = (user) => {
+  return async (dispatch) => {
+    dispatch({ type: SET_USER_LOADER });
+    try {
+      const data = await axios.post(`api/user/login`, user);
+
+      if (data instanceof Error) throw data;
+
+      Cookies.set("accessToken", `Bearer ${data.data.accessToken}`, {
+        expires: 1,
+      });
+      Cookies.set("refreshToken", data.data.refreshToken, { expires: 1 });
+      dispatch({
+        type: SET_USER,
+        payload: { ...data.data.userData, onBreak: false },
+      });
+    } catch (err) {
+      errorFade(dispatch, err.response.data);
+    }
   };
 };
 
@@ -78,26 +104,28 @@ export const registerUser = (newUser) => {
   return async (dispatch) => {
     dispatch({ type: SET_USER_LOADER });
 
-    await axios.post(`api/user/register`, newUser).catch((err) => {
-      errorFade(dispatch, err.message);
-    });
+    try {
+      const isError = await axios.post(`api/user/register`, newUser);
 
-    const { email, password } = newUser;
+      if (isError instanceof Error) throw isError;
 
-    const data = await axios
-      .post(`api/user/login`, { email, password })
-      .catch((err) => {
-        errorFade(dispatch, err.message);
+      const { email, password } = newUser;
+
+      const data = await axios.post(`api/user/login`, { email, password });
+
+      if (data instanceof Error) throw data;
+
+      Cookies.set("accessToken", `Bearer ${data.data.accessToken}`, {
+        expires: 1,
       });
-
-    Cookies.set("accessToken", `Bearer ${data.data.accessToken}`, {
-      expires: 1,
-    });
-    Cookies.set("refreshToken", data.data.refreshToken, { expires: 1 });
-    dispatch({
-      type: SET_USER,
-      payload: { ...data.data.userData, onBreak: false },
-    });
+      Cookies.set("refreshToken", data.data.refreshToken, { expires: 1 });
+      dispatch({
+        type: SET_USER,
+        payload: { ...data.data.userData, onBreak: false },
+      });
+    } catch (err) {
+      errorFade(dispatch, err.response.data);
+    }
   };
 };
 

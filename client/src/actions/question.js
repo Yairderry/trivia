@@ -23,6 +23,8 @@ const errorFade = (dispatch, message) => {
   setTimeout(() => dispatch({ type: SET_QUESTION_ERROR, payload: "" }), 3000);
 };
 
+// TODO:user network wrapper axios
+
 export const getQuestion = () => {
   return (dispatch, getState) => {
     dispatch({ type: SET_QUESTION_LOADER });

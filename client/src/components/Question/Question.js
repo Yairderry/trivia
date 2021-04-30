@@ -17,17 +17,18 @@ export default function Question() {
       {loading && <Loader />}
       <div>{question}</div>
       <div>
-        {options.map((option, i) => {
-          return (
-            <Option
-              key={i}
-              option={option}
-              answer={
-                option === true ? true : option === false ? false : option
-              }
-            />
-          );
-        })}
+        {options &&
+          options.map((option, i) => {
+            return (
+              <Option
+                key={i}
+                option={option}
+                answer={
+                  option === true ? true : option === false ? false : option
+                }
+              />
+            );
+          })}
       </div>
     </div>
   );

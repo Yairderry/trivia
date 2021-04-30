@@ -10,6 +10,7 @@ const {
   logout,
   newToken,
   getUser,
+  endGameFor,
 } = require("../utils");
 const { validateToken } = require("./middlewares/validateToken");
 
@@ -55,6 +56,19 @@ user.put("/update-score", async (req, res) => {
   }
 });
 
+user.put("/end-game", async (req, res) => {
+  try {
+    const { id, score, topScore } = req.body;
+    const user = await endGameFor(Number(id), Number(score), Number(topScore));
+    res.json({ ...user, loading: false, error: "" });
+  } catch (error) {
+    if (error.message === "User not found")
+      return res.status(404).send(error.message);
+
+    res.status(500).send(error.message);
+  }
+});
+
 user.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -67,6 +81,9 @@ user.post("/login", async (req, res) => {
 
     if (err.message === "User already logged in")
       return res.status(403).send(err.message);
+
+    if (err.message === "Cannot find user")
+      return res.status(404).send(err.message);
 
     return res.status(500).send(err.message);
   }

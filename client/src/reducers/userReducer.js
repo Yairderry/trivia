@@ -13,6 +13,7 @@ const initialUserValue = {
   id: 0,
   name: "",
   score: null,
+  topScore: null,
   playing: false,
   onBreak: false,
   strikes: null,

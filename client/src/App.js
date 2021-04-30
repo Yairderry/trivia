@@ -4,7 +4,6 @@ import { BrowserRouter, Redirect, Link, Switch, Route } from "react-router-dom";
 import { useEffect } from "react";
 import Login from "./components/Login";
 import Game from "./components/Game";
-import Scoreboard from "./components/Scoreboard/Scoreboard";
 import { getUser } from "./actions";
 import Register from "./components/Register";
 import Home from "./components/Home";
@@ -13,7 +12,7 @@ import Lobby from "./components/Lobby";
 function App() {
   const { id } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-
+  // TODO: add redirect to home when refreshing
   useEffect(() => {
     dispatch(getUser());
   }, []);

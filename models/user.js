@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   user.init(
     {
       score: DataTypes.INTEGER,
+      topScore: DataTypes.INTEGER,
       name: DataTypes.STRING,
       strikes: DataTypes.INTEGER,
       playing: {
