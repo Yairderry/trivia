@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../Network/NetworkWrapper";
 
 export const SET_ANSWER = "SET_ANSWER";
 export const PICK_ANSWER = "PICK_ANSWER";

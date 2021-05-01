@@ -298,6 +298,7 @@ const questionType1 = async (columns, question, desc, type) => {
     desc,
     type,
     question,
+    options,
   };
 };
 
@@ -449,30 +450,26 @@ const login = async (user) => {
   const { email, name, userId } = loginUser;
   const token = await RefreshTokens.findOne({ where: { userId } });
 
-  if (token) {
-    throw new Error("User already logged in");
-  } else {
-    const accessToken = sign(
-      { result: { email, name, userId } },
-      process.env.JWT_CODE,
-      {
-        expiresIn: "1m",
-      }
-    );
+  const accessToken = sign(
+    { result: { email, name, userId } },
+    process.env.JWT_CODE,
+    {
+      expiresIn: "1m",
+    }
+  );
 
-    const refreshToken = sign(
-      { result: { email, name, userId } },
-      process.env.JWT_REFRESH_CODE,
-      {
-        expiresIn: "7d",
-      }
-    );
+  const refreshToken = sign(
+    { result: { email, name, userId } },
+    process.env.JWT_REFRESH_CODE,
+    {
+      expiresIn: "7d",
+    }
+  );
 
-    const userData = await getUser(userId);
+  const userData = await getUser(userId);
 
-    await RefreshTokens.create({ token: refreshToken, userId });
-    return { userData, accessToken, refreshToken };
-  }
+  await RefreshTokens.create({ token: refreshToken, userId });
+  return { userData, accessToken, refreshToken };
 };
 
 const logout = async (refreshToken) => {

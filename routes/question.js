@@ -5,12 +5,13 @@ const {
   saveQuestion,
   rateQuestion,
 } = require("../utils");
+const { validateToken } = require("./middlewares/validateToken");
 
 const question = Router();
 
 // TODO:add validate token middleware
 
-question.get("/new", async (req, res) => {
+question.get("/new", validateToken, async (req, res) => {
   try {
     const { userId } = req.query;
 
@@ -29,7 +30,7 @@ question.get("/new", async (req, res) => {
   }
 });
 
-question.post("/check-answer", async (req, res) => {
+question.post("/check-answer", validateToken, async (req, res) => {
   try {
     const { answer, questionId, userId } = req.query;
     const { countriesId, columns, desc, type } = req.body;
@@ -48,7 +49,7 @@ question.post("/check-answer", async (req, res) => {
   }
 });
 
-question.post("/save", async (req, res) => {
+question.post("/save", validateToken, async (req, res) => {
   try {
     const { rating } = req.query;
     console.log(req.body);
@@ -59,7 +60,7 @@ question.post("/save", async (req, res) => {
   }
 });
 
-question.put("/rate", async (req, res) => {
+question.put("/rate", validateToken, async (req, res) => {
   try {
     const { id, rating } = req.query;
     const questionRated = await rateQuestion(Number(id), Number(rating));

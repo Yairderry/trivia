@@ -1,7 +1,6 @@
 const { Router } = require("express");
 const express = require("express");
-// const jwt = require("jsonwebtoken");
-// const cookieParser = require("cookie-parser");
+
 const {
   getScoreboard,
   updateScore,
@@ -33,7 +32,7 @@ user.get("/", validateToken, async (req, res) => {
   }
 });
 
-user.get("/scoreboard", async (req, res) => {
+user.get("/scoreboard", validateToken, async (req, res) => {
   try {
     const scoreboard = (await getScoreboard()).map((user) => {
       user.strikes = undefined;
@@ -46,7 +45,7 @@ user.get("/scoreboard", async (req, res) => {
   }
 });
 
-user.put("/update-score", async (req, res) => {
+user.put("/update-score", validateToken, async (req, res) => {
   try {
     const { id, score } = req.query;
     const updatedScore = await updateScore(Number(id), Number(score));
@@ -56,7 +55,7 @@ user.put("/update-score", async (req, res) => {
   }
 });
 
-user.put("/end-game", async (req, res) => {
+user.put("/end-game", validateToken, async (req, res) => {
   try {
     const { id, score, topScore } = req.body;
     const user = await endGameFor(Number(id), Number(score), Number(topScore));

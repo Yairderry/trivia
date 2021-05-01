@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../Network/NetworkWrapper";
 
 export const SET_QUESTION = "SET_QUESTION";
 export const SET_QUESTION_ERROR = "SET_QUESTION_ERROR";
@@ -22,8 +22,6 @@ const errorFade = (dispatch, message) => {
   dispatch({ type: SET_QUESTION_ERROR, payload: message });
   setTimeout(() => dispatch({ type: SET_QUESTION_ERROR, payload: "" }), 3000);
 };
-
-// TODO:user network wrapper axios
 
 export const getQuestion = () => {
   return (dispatch, getState) => {

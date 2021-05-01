@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../Network/NetworkWrapper";
 
 export const SET_BOARD = "SET_BOARD";
 export const SET_BOARD_ERROR = "SET_BOARD_ERROR";

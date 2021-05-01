@@ -51,18 +51,20 @@ export default function Game() {
         <Rating />
       ) : (
         <>
-          <button
-            className="submit-btn"
-            onClick={() => {
-              clearTimeout(timerRef[1]);
-              clearInterval(timerRef[0]);
-              dispatch(endQuestion());
-              if (!onBreak) dispatch(checkAnswer());
-              dispatch(startBreak());
-            }}
-          >
-            Submit
-          </button>
+          {strikes < 3 && (
+            <button
+              className="submit-btn"
+              onClick={() => {
+                clearTimeout(timerRef[1]);
+                clearInterval(timerRef[0]);
+                dispatch(endQuestion());
+                if (!onBreak) dispatch(checkAnswer());
+                dispatch(startBreak());
+              }}
+            >
+              Submit
+            </button>
+          )}
 
           <Link onClick={() => dispatch(endGame())} to="/lobby">
             Back to lobby
