@@ -8,13 +8,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      this.belongsToMany(models.User, { through: "users_questions" });
     }
   }
   Users_Questions.init(
     {
       userId: DataTypes.INTEGER,
-      savedQuestionId: DataTypes.INTEGER,
+      usersQuestionId: DataTypes.INTEGER,
     },
     {
       sequelize,

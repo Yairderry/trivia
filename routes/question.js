@@ -9,8 +9,6 @@ const { validateToken } = require("./middlewares/validateToken");
 
 const question = Router();
 
-// TODO:add validate token middleware
-
 question.get("/new", validateToken, async (req, res) => {
   try {
     const { userId } = req.query;

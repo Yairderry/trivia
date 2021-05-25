@@ -8,10 +8,13 @@ import ErrorMessage from "../ErrorMessage";
 export default function Scoreboard() {
   const { scoreboard, error, loading } = useSelector((state) => state.board);
   const { playing } = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(getScoreboard());
   }, [playing]);
+
   return (
     <div className="score-board-section">
       <h1>score board</h1>

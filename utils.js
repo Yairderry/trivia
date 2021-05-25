@@ -206,7 +206,7 @@ const checkAnswerType4 = async (answer, questionId, userId) => {
       ? true
       : expectedAnswer;
 
-  await UsersQuestions.create({ userId, savedQuestionId: questionId });
+  await UsersQuestions.create({ userId, usersQuestionId: questionId });
   return {
     correctAnswer: correctAnswer.answer,
     userAnswer: answer,
@@ -219,14 +219,14 @@ const getSavedQuestion = async (id) => {
   const questionsAsked = await User.findOne({
     where: { id },
     include: {
-      model: SavedQuestion,
+      model: UsersQuestions,
     },
   });
 
   const questions = await SavedQuestion.findAll({
     where: {
       id: {
-        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
+        [Op.notIn]: questionsAsked.toJSON().UsersQuestions.map((q) => q.id),
       },
     },
     attributes: [
@@ -350,7 +350,7 @@ const calculateSavedQuestionChance = async (id) => {
   const questionsAsked = await User.findOne({
     where: { id },
     include: {
-      model: SavedQuestion,
+      model: UsersQuestions,
     },
   });
 
@@ -359,7 +359,7 @@ const calculateSavedQuestionChance = async (id) => {
   const questions = await SavedQuestion.findAndCountAll({
     where: {
       id: {
-        [Op.notIn]: questionsAsked.toJSON().SavedQuestions.map((q) => q.id),
+        [Op.notIn]: questionsAsked.toJSON().UsersQuestions.map((q) => q.id),
       },
     },
   });
