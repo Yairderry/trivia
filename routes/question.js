@@ -12,12 +12,17 @@ const question = Router();
 question.get("/new", validateToken, async (req, res) => {
   try {
     const { userId } = req.query;
+    console.log("userId", userId);
 
     if (!Number(userId)) throw Error("You need to enter user id!");
+    console.log("Number(userId)", Number(userId));
 
     const question = await getQuestion(Number(userId));
+    console.log("question", question);
     res.json({ ...question, loading: false, error: "" });
   } catch (error) {
+    console.log(error);
+    console.log(JSON.stringify(error));
     if (error.message === "You need to enter user id!")
       return res.status(400).send(error.message);
 
