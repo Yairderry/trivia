@@ -21,7 +21,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "setup": "npx sequelize db:migrate && npx sequelize db:seed:all",
-    "start": "node index.js"
+    "start": "cd client && npm run build && cd .. && node index.js"
   },
   "repository": {
     "type": "git",
