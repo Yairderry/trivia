@@ -32,13 +32,8 @@ export const getQuestion = () => {
 
     axios
       .get(`api/question/new?userId=${user.id}`)
-      .then((data) => {
-        console.log(data);
-        dispatch({ type: SET_QUESTION, payload: data.data });
-      })
+      .then((data) => dispatch({ type: SET_QUESTION, payload: data.data }))
       .catch((err) => {
-        console.log(err);
-        console.log(JSON.stringify(err));
         errorFade(dispatch, err.message);
       });
   };
