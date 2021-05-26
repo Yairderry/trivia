@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("users", "strikes", {
+    await queryInterface.addColumn("Users", "strikes", {
       type: Sequelize.INTEGER,
       validate: {
         max: 3,
@@ -12,6 +12,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn("users", "strikes");
+    await queryInterface.removeColumn("Users", "strikes");
   },
 };

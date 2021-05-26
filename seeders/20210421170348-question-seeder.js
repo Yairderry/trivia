@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert(
-      "questions",
+      "Questions",
       [
         {
           template: "Which country is most populous?",
@@ -189,6 +189,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete("questions", null, {});
+    await queryInterface.bulkDelete("Questions", null, {});
   },
 };

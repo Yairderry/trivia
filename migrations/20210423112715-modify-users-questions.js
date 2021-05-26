@@ -3,7 +3,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.renameColumn(
-      "users_questions",
+      "Users_Questions",
       "question_id",
       "saved_question_id"
     );
@@ -11,7 +11,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.renameColumn(
-      "users_questions",
+      "Users_Questions",
       "saved_question_id",
       "question_id"
     );
